@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:doubao_speech/doubao_speech.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() {
@@ -28,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> _initDoubao() async {
     // Initialize plugin
     await DoubaoSpeech.init();
-    
+
     // Listen to events
     DoubaoSpeech.events.listen((event) {
       setState(() {
@@ -54,27 +57,26 @@ class _MyAppState extends State<MyApp> {
         }
       });
     });
-    
+
     // Prepare engine
     await DoubaoSpeech.prepare();
-    
+
     // Get AEC model path
-    final appDir = await getApplicationDocumentsDirectory();
-    final aecPath = '${appDir.path}/aec.model';
-    
+    final aecPath = await _getAecModelPath();
+
     // Initialize engine
     final success = await DoubaoSpeech.initializeEngine(
-      appId: 'YOUR_APP_ID',      // 替换为你的 App ID
-      appKey: 'YOUR_APP_KEY',    // 替换为你的 App Key
-      token: 'YOUR_TOKEN',       // 替换为你的 Token
+      appId: 'YOUR_APP_ID', // 替换为你的 App ID
+      appKey: 'YOUR_APP_KEY', // 替换为你的 App Key
+      token: 'YOUR_TOKEN', // 替换为你的 Token
       uid: 'flutter_user',
-      enableAEC: true,           // 开启回声消除
-      aecModelPath: aecPath,     // AEC 模型路径
-      recorderType: 'RECORDER',  // 使用设备麦克风
-      enablePlayer: true,        // 使用内置播放器
+      enableAEC: true, // 开启回声消除
+      aecModelPath: aecPath, // AEC 模型路径
+      recorderType: 'RECORDER', // 使用设备麦克风
+      enablePlayer: true, // 使用内置播放器
       enableDecoderCallback: true, // 启用解码器回调（用于保存音频）
     );
-    
+
     if (success) {
       setState(() {
         _isReady = true;
@@ -92,10 +94,10 @@ class _MyAppState extends State<MyApp> {
       _messages.add('❌ 启动失败');
       return;
     }
-    
+
     // Play greeting
     await DoubaoSpeech.sayHello('你好，我是豆包助手，有什么可以帮你的吗？');
-    
+
     setState(() {
       _isTalking = true;
     });
@@ -111,10 +113,10 @@ class _MyAppState extends State<MyApp> {
   Future<void> _sendText() async {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
-    
+
     _messages.add('👤 我(文字): $text');
     _textController.clear();
-    
+
     await DoubaoSpeech.sendTextQuery(text);
   }
 
@@ -157,7 +159,7 @@ class _MyAppState extends State<MyApp> {
                 },
               ),
             ),
-            
+
             // 指令按钮
             if (_isReady)
               SizedBox(
@@ -173,7 +175,7 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
               ),
-            
+
             // 文字输入
             Padding(
               padding: const EdgeInsets.all(16),
@@ -218,5 +220,21 @@ class _MyAppState extends State<MyApp> {
     DoubaoSpeech.dispose();
     _textController.dispose();
     super.dispose();
+  }
+
+  // 获取 AEC 模型路径的函数
+  Future<String> _getAecModelPath() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final aecFile = File('${appDir.path}/aec.model');
+
+    // 如果文件不存在，从 assets 复制
+    if (!await aecFile.exists()) {
+      final byteData = await rootBundle.load('assets/aec.model');
+      final buffer = byteData.buffer;
+      await aecFile.writeAsBytes(
+          buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+    }
+
+    return aecFile.path;
   }
 }
