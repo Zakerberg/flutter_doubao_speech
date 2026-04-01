@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:doubao_speech/doubao_speech_platform_interface.dart';
 import 'package:doubao_speech/doubao_speech_event.dart';
 import 'package:flutter/services.dart';
 
@@ -13,10 +12,6 @@ class DoubaoSpeech {
 
   static StreamController<SpeechEvent>? _eventController;
   static bool _initialized = false;
-
-  Future<String?> getPlatformVersion() {
-    return DoubaoSpeechPlatform.instance.getPlatformVersion();
-  }
 
   /// Initialize the plugin and set up event stream
   static Future<void> init() async {
