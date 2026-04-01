@@ -1,0 +1,28 @@
+#
+# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
+#
+Pod::Spec.new do |s|
+  s.name             = 'doubao_speech'
+  s.version          = '0.0.1'
+  s.summary          = 'Flutter plugin for Doubao Speech-to-Speech real-time voice interaction SDK.'
+  s.description      = <<-DESC
+  Flutter plugin for Doubao Speech-to-Speech real-time voice interaction SDK.
+  Provides low-latency, bidirectional streaming voice conversation capabilities.
+                       DESC
+  s.homepage         = 'https://github.com/yourusername/doubao_speech'
+  s.license          = { :file => '../LICENSE' }
+  s.author           = { 'Your Company' => 'email@example.com' }
+  s.source           = { :path => '.' }
+  s.source_files = 'Classes/**/*'
+  s.dependency 'Flutter'
+  s.dependency 'SpeechEngineToB', '0.0.14.3-bugfix'
+  s.dependency 'SocketRocket', '0.6.1'
+  s.platform = :ios, '12.0'
+
+  # Flutter.framework does not contain a i386 slice.
+  s.pod_target_xcconfig = { 
+    'DEFINES_MODULE' => 'YES', 
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386'
+  }
+  s.swift_version = '5.0'
+end
