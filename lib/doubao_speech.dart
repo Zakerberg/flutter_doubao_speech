@@ -107,6 +107,7 @@ class DoubaoSpeech {
     bool enableResampler = false,
     int? customSampleRate,
     int? customChannel,
+    String speaker = 'zh_female_vv_jupiter_bigtts', // 新增音色参数
   }) async {
     return await _methodChannel.invokeMethod('init', {
       'engineName': engineName,
@@ -130,6 +131,7 @@ class DoubaoSpeech {
       'enableResampler': enableResampler,
       'customSampleRate': customSampleRate,
       'customChannel': customChannel,
+      'speaker': speaker,
     });
   }
 

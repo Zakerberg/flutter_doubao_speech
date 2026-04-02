@@ -172,9 +172,20 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         // 先同步停止，避免异步问题
         engine.send(SEDirectiveSyncStopEngine)
         
-        // 启动引擎
-        let ret = engine.send(SEDirectiveStartEngine, data: "{\"dialog\":{\"bot_name\":\"豆包\"}}")
+        // 启动引擎，使用保存的音色配置
+        let ttsConfig = """
+        {
+            "dialog": {
+                "bot_name": "豆包"
+            },
+            "tts": {
+                "speaker": "\(speaker)"
+            }
+        }
+        """
         
+        let ret = engine.send(SEDirectiveStartEngine, data: ttsConfig)
+
         if ret == SENoError {
             result(true)
         } else {
