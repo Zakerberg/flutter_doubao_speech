@@ -11,6 +11,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.EventChannel.StreamHandler
 import io.flutter.plugin.common.EventChannel.EventSink
+import org.json.JSONObject
 
 class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
     private lateinit var methodChannel: MethodChannel
@@ -192,7 +193,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         }
 
         val content = call.arguments as? String ?: "我是你的AI助手，请问有什么可以帮你。"
-        val data = "{\"content\": \"$content\"}"
+        val data = buildContentPayload(content)
         val ret = engine.sendDirective(SEDirectiveEventSayHello, data)
 
         if (ret == SENoError) {
@@ -209,7 +210,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         }
 
         val content = call.arguments as? String ?: ""
-        val data = "{\"content\": \"$content\"}"
+        val data = buildContentPayload(content)
         val ret = engine.sendDirective(SEDirectiveEventChatTextQuery, data)
 
         if (ret == SENoError) {
@@ -222,6 +223,10 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
     private fun sendCommand(call: MethodCall, result: Result) {
         // 自然语言指令通过文本查询发送
         sendTextQuery(call, result)
+    }
+
+    private fun buildContentPayload(content: String): String {
+        return JSONObject().put("content", content).toString()
     }
 
     private fun destroyEngine(result: Result) {
@@ -272,6 +277,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         engine?.destroyEngine()
         engine = null
         context = null
+        isInitialized = false
     }
 
     override fun onListen(arguments: Any?, events: EventSink?) {

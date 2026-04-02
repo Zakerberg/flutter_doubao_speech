@@ -1,6 +1,5 @@
 # doubao_speech
 
-<<<<<<< HEAD
 #### 介绍
 Flutter doubao_speech
 
@@ -36,7 +35,7 @@ Flutter doubao_speech
 4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
 5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
 6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
-=======
+
 A new Flutter plugin project.
 
 ## Getting Started
@@ -50,4 +49,3 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
->>>>>>> main

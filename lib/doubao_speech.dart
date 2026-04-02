@@ -11,6 +11,7 @@ class DoubaoSpeech {
       EventChannel('doubao_speech/events');
 
   static StreamController<SpeechEvent>? _eventController;
+  static StreamSubscription<dynamic>? _eventSubscription;
   static bool _initialized = false;
 
   /// Initialize the plugin and set up event stream
@@ -19,7 +20,8 @@ class DoubaoSpeech {
 
     _eventController = StreamController<SpeechEvent>.broadcast();
 
-    _eventChannel.receiveBroadcastStream().listen((dynamic event) {
+    _eventSubscription =
+        _eventChannel.receiveBroadcastStream().listen((dynamic event) {
       final map = Map<String, dynamic>.from(event);
       final type = map['type'] as String;
 
@@ -166,6 +168,8 @@ class DoubaoSpeech {
 
   /// Dispose the plugin
   static void dispose() {
+    _eventSubscription?.cancel();
+    _eventSubscription = null;
     if (_eventController != null) {
       _eventController?.close();
       _eventController = null;

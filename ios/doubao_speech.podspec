@@ -15,9 +15,10 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'SpeechEngineToB', '0.0.14.3-bugfix'
+  s.dependency 'SpeechEngineToB', '0.0.14.2-bugfix'
   s.dependency 'SocketRocket', '0.6.1'
   s.platform = :ios, '12.0'
+  s.static_framework = true
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 

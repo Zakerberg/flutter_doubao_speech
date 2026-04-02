@@ -1,4 +1,5 @@
 import Flutter
+import Foundation
 import UIKit
 import SpeechEngineToB
 
@@ -134,7 +135,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         
         // 工作模式配置（用于自定义 TTS）
         if let workMode = args["workMode"] as? Int {
-            engine.setIntParam(Int32(workMode), forKey: SE_PARAMS_KEY_DIALOG_WORK_MODE_INT)
+            engine.setIntParam(workMode, forKey: SE_PARAMS_KEY_DIALOG_WORK_MODE_INT)
         }
         
         // 重采样配置（自定义音频输入时使用）
@@ -142,10 +143,10 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
             engine.setBoolParam(enableResampler, forKey: SE_PARAMS_KEY_ENABLE_RESAMPLER_BOOL)
         }
         if let customSampleRate = args["customSampleRate"] as? Int {
-            engine.setIntParam(Int32(customSampleRate), forKey: SE_PARAMS_KEY_CUSTOM_SAMPLE_RATE_INT)
+            engine.setIntParam(customSampleRate, forKey: SE_PARAMS_KEY_CUSTOM_SAMPLE_RATE_INT)
         }
         if let customChannel = args["customChannel"] as? Int {
-            engine.setIntParam(Int32(customChannel), forKey: SE_PARAMS_KEY_CUSTOM_CHANNEL_INT)
+            engine.setIntParam(customChannel, forKey: SE_PARAMS_KEY_CUSTOM_CHANNEL_INT)
         }
         
         // 初始化引擎
@@ -169,10 +170,10 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         }
         
         // 先同步停止，避免异步问题
-        engine.sendDirective(SEDirectiveSyncStopEngine)
+        engine.send(SEDirectiveSyncStopEngine)
         
         // 启动引擎
-        let ret = engine.sendDirective(SEDirectiveStartEngine, data: "{\"dialog\":{\"bot_name\":\"豆包\"}}")
+        let ret = engine.send(SEDirectiveStartEngine, data: "{\"dialog\":{\"bot_name\":\"豆包\"}}")
         
         if ret == SENoError {
             result(true)
@@ -189,7 +190,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        let ret = engine.sendDirective(SEDirectiveSyncStopEngine)
+        let ret = engine.send(SEDirectiveSyncStopEngine)
         result(ret == SENoError)
     }
     
@@ -202,8 +203,8 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         }
         
         let content = call.arguments as? String ?? "我是你的AI助手，请问有什么可以帮你。"
-        let data = "{\"content\": \"\(content)\"}"
-        let ret = engine.sendDirective(SEDirectiveEventSayHello, data: data)
+        let data = buildContentPayload(content)
+        let ret = engine.send(SEDirectiveEventSayHello, data: data)
         
         if ret == SENoError {
             result(true)
@@ -223,8 +224,8 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         }
         
         let content = call.arguments as? String ?? ""
-        let data = "{\"content\": \"\(content)\"}"
-        let ret = engine.sendDirective(SEDirectiveEventChatTextQuery, data: data)
+        let data = buildContentPayload(content)
+        let ret = engine.send(SEDirectiveEventChatTextQuery, data: data)
         
         if ret == SENoError {
             result(true)
@@ -239,9 +240,18 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         // 自然语言指令通过文本查询发送
         sendTextQuery(call: call, result: result)
     }
+
+    private func buildContentPayload(_ content: String) -> String {
+        let json: [String: String] = ["content": content]
+        guard let data = try? JSONSerialization.data(withJSONObject: json),
+              let jsonString = String(data: data, encoding: .utf8) else {
+            return "{\"content\":\"\"}"
+        }
+        return jsonString
+    }
     
     private func destroyEngine(result: @escaping FlutterResult) {
-        engine?.destroyEngine()
+        engine?.destroy()
         engine = nil
         isInitialized = false
         result(true)
