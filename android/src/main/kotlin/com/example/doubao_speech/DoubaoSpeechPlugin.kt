@@ -20,6 +20,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
     private var engine: SpeechEngine? = null
     private var context: Context? = null
     private var isInitialized = false
+    private var speaker: String = "zh_female_vv_jupiter_bigtts" // 存储音色配置
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         context = binding.applicationContext
@@ -64,6 +65,13 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         val engine = engine ?: run {
             result.error("ENGINE_NOT_PREPARED", "Engine not prepared", null)
             return
+        }
+
+        // 保存音色配置
+        (args?.get("speaker") as? String)?.let {
+            if (it.isNotEmpty()) {
+                speaker = it
+            }
         }
 
         // 必需配置
@@ -166,8 +174,19 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         // 先同步停止
         engine.sendDirective(SEDirectiveSyncStopEngine)
 
-        // 启动引擎
-        val ret = engine.sendDirective(SEDirectiveStartEngine, "{\"dialog\":{\"bot_name\":\"豆包\"}}")
+        // 启动引擎，使用保存的音色配置
+        val ttsConfig = """
+            {
+                "dialog": {
+                    "bot_name": "豆包"
+                },
+                "tts": {
+                    "speaker": "$speaker"
+                }
+            }
+        """.trimIndent()
+        
+        val ret = engine.sendDirective(SEDirectiveStartEngine, ttsConfig)
 
         if (ret == SENoError) {
             result.success(true)
