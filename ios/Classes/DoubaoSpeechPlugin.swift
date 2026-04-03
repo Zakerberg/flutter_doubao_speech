@@ -185,8 +185,8 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
                     "tts": ["speaker": speaker]
                    ]
 
-        let jsonData = try? JSONSerialization.data(withJSONObject: dict) ?? "{\"dialog\":{\"bot_name\":\"豆包\"}"
-        let ttsConfig = jsonData.flatMap { String(data: $0, encoding: .utf8) }
+        let jsonData = try? JSONSerialization.data(withJSONObject: dict) 
+        let ttsConfig = jsonData.flatMap { String(data: $0, encoding: .utf8) } ?? "{\"dialog\":{\"bot_name\":\"豆包\"}"
         
         let ret = engine.send(SEDirectiveStartEngine, data: ttsConfig)
 
