@@ -175,16 +175,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         engine.sendDirective(SEDirectiveSyncStopEngine)
 
         // 启动引擎，使用保存的音色配置
-        val ttsConfig = """
-            {
-                "dialog": {
-                    "bot_name": "豆包"
-                },
-                "tts": {
-                    "speaker": "$speaker"
-                }
-            }
-        """.trimIndent()
+        val ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\"},\"tts\":{\"speaker\":\"$(speaker)\"}".trimIndent()
         
         val ret = engine.sendDirective(SEDirectiveStartEngine, ttsConfig)
 
