@@ -8,6 +8,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
     private var methodChannel: FlutterMethodChannel?
     private var eventSink: FlutterEventSink?
     private var isInitialized = false
+    private var speaker: String = "zh_female_linjianvhai_moon_bigtts" // 存储音色配置
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let methodChannel = FlutterMethodChannel(
@@ -69,6 +70,11 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
                                message: "Invalid arguments or engine not prepared", 
                                details: nil))
             return
+        }
+        
+        // 保存音色配置
+        if let speakerValue = args["speaker"] as? String, !speakerValue.isEmpty {
+            speaker = speakerValue
         }
         
         // 必需配置
@@ -178,6 +184,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
                     "dialog": ["bot_name": "豆包"],
                     "tts": ["speaker": speaker]
                    ]
+
         let jsonData = try? JSONSerialization.data(withJSONObject: dict)
         let ttsConfig = jsonData.flatMap { String(data: $0, encoding: .utf8) }
         
