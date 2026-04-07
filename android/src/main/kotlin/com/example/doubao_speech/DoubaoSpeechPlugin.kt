@@ -176,7 +176,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
 
         // 启动引擎，使用保存的音色配置
         // val ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\"},\"tts\":{\"speaker\":\"${speaker}\"}".trimIndent()
-        val ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\",\"extra\":{\"model\":\"2.2.0.0\"}},\"tts\":{\"speaker\":\"$speaker\"}}"
+        val ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\",\"extra\":{\"model\":\"2.2.0.0\", \"input_mod\": \"keep_alive\"}},\"tts\":{\"speaker\":\"$speaker\"}}"
 
         val ret = engine.sendDirective(SEDirectiveStartEngine, ttsConfig)
 

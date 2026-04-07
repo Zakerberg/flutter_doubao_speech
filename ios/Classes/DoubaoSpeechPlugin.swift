@@ -188,7 +188,8 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
             "dialog": [
                 "bot_name": "豆包",
                 "extra": [
-                    "model": "2.2.0.0"   // SC2.0版本，支持你的 S_ 音色
+                    "model": "2.2.0.0",   // SC2.0版本，支持你的 S_ 音色
+                    "input_mod": "keep_alive"
                 ]
             ],
             "tts": [
