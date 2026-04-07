@@ -180,10 +180,21 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         
         // 启动引擎，使用保存的音色配置
         // let ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\"}"
-        let dict = [
-                    "dialog": ["bot_name": "豆包"],
-                    "tts": ["speaker": speaker]
-                   ]
+//        let dict = [
+//                    "dialog": ["bot_name": "豆包"],
+//                    "tts": ["speaker": speaker]
+//                   ]
+        let dict: [String: Any] = [
+            "dialog": [
+                "bot_name": "豆包",
+                "extra": [
+                    "model": "2.2.0.0"   // SC2.0版本，支持你的 S_ 音色
+                ]
+            ],
+            "tts": [
+                "speaker": speaker   // S_jfyjOWwY1
+            ]
+        ]
 
         let jsonData = try? JSONSerialization.data(withJSONObject: dict) 
         let ttsConfig = jsonData.flatMap { String(data: $0, encoding: .utf8) } ?? "{\"dialog\":{\"bot_name\":\"豆包\"}"
