@@ -8,7 +8,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
     private var methodChannel: FlutterMethodChannel?
     private var eventSink: FlutterEventSink?
     private var isInitialized = false
-    private var speaker: String = "zh_female_linjianvhai_moon_bigtts" // 存储音色配置
+    private var speaker: String = "zh_female_vv_jupiter_bigtts" // 存储音色配置
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let methodChannel = FlutterMethodChannel(
