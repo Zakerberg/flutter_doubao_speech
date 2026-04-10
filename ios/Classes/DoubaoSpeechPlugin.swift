@@ -118,9 +118,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         }
         
         // 录音机配置
-        if let recorderType = args["recorderType"] as? String {
-            engine.setStringParam(recorderType, forKey: SE_PARAMS_KEY_RECORDER_TYPE_STRING)
-        }
+        engine.setStringParam(SE_RECORDER_TYPE_RECORDER, forKey: SE_PARAMS_KEY_RECORDER_TYPE_STRING)
         if let recorderPath = args["recorderPath"] as? String, !recorderPath.isEmpty {
             engine.setStringParam(recorderPath, forKey: SE_PARAMS_KEY_DIALOG_RECORDER_PATH_STRING)
         }
