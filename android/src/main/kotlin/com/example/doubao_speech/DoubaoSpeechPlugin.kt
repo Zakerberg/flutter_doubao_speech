@@ -256,7 +256,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
             SEDialogChatEnded -> sendEvent("chat_end", null)
             SEDialogPlayerAudio -> data?.let { sendAudioEvent("player_audio", it) }
             SEDecoderAudioData -> data?.let { sendAudioEvent("decoder_audio", it) }
-            SEDialogRecorderAudio -> data?.let { sendAudioEvent("recorder_audio", it) }
+            SERecorderAudioData -> data?.let { sendAudioEvent("recorder_audio", it) }
             else -> {}
         }
     }
