@@ -50,6 +50,6 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.bytedance.speechengine:speechengine_tob:0.0.14.3-bugfix'
+    implementation 'com.bytedance.speechengine:speechengine_tob:0.0.14.2-bugfix'
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
 }
