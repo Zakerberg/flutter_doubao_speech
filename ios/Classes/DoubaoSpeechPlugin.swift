@@ -170,10 +170,6 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
             } catch {
                 print("[DoubaoSpeech] Failed to reactivate AudioSession: \(error)")
             }
-        // ========== 方案1：禁用 SDK 内部的 AudioSession 管理 ==========
-        engine.setBoolParam(false, forKey: SE_PARAMS_KEY_RESTART_AUDIOSESSION_BOOL)
-        engine.setBoolParam(false, forKey: SE_PARAMS_KEY_RESET_AUDIOSESSION_BOOL)
-        // ============================================================
         
         // 初始化引擎
         let ret = engine.initEngine()
@@ -198,12 +194,6 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         // 先同步停止，避免异步问题
         engine.send(SEDirectiveSyncStopEngine)
         
-        // 启动引擎，使用保存的音色配置
-        // let ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\"}"
-        //        let dict = [
-        //                    "dialog": ["bot_name": "豆包"],
-        //                    "tts": ["speaker": speaker]
-        //                   ]
         let dict: [String: Any] = [
             "dialog": [
                 "bot_name": "豆包",
@@ -374,13 +364,33 @@ extension DoubaoSpeechPlugin: SpeechEngineDelegate {
                 self.sendEvent(type: "asr_start", data: nil)
                 
             case SEEventASRResponse:
-                self.sendEvent(type: "asr_result", data: String(data: data, encoding: .utf8))
+//                self.sendEvent(type: "asr_result", data: String(data: data, encoding: .utf8))
+                   // ASR 结果需要解析
+                    if let jsonString = String(data: data, encoding: .utf8),
+                       let jsonData = jsonString.data(using: .utf8),
+                       let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+                       let results = json["results"] as? [[String: Any]],
+                       let firstResult = results.first,
+                       let text = firstResult["text"] as? String {
+                        self.sendEvent(type: "asr_result", data: text)
+                    } else {
+                        self.sendEvent(type: "asr_result", data: String(data: data, encoding: .utf8))
+                    }
                 
             case SEEventASREnded:
                 self.sendEvent(type: "asr_end", data: nil)
                 
             case SEEventChatResponse:
-                self.sendEvent(type: "chat_result", data: String(data: data, encoding: .utf8))
+//                self.sendEvent(type: "chat_result", data: String(data: data, encoding: .utf8))
+                // 提取 content 字段
+                if let jsonString = String(data: data, encoding: .utf8),
+                   let jsonData = jsonString.data(using: .utf8),
+                   let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+                   let content = json["content"] as? String {
+                       self.sendEvent(type: "chat_result", data: content)
+                    } else {
+                        self.sendEvent(type: "chat_result", data: String(data: data, encoding: .utf8))
+                    }
                 
             case SEEventChatEnded:
                 self.sendEvent(type: "chat_end", data: nil)

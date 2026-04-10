@@ -110,9 +110,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         }
 
         // 录音机配置
-        args?.get("recorderType")?.let {
-            engine.setStringParam(it as String, SE_PARAMS_KEY_RECORDER_TYPE_STRING)
-        }
+        engine.setStringParam(SE_RECORDER_TYPE_RECORDER, SE_PARAMS_KEY_RECORDER_TYPE_STRING)
         args?.get("recorderPath")?.let {
             engine.setStringParam(it as String, SE_PARAMS_KEY_DIALOG_RECORDER_PATH_STRING)
         }
@@ -175,7 +173,6 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         engine.sendDirective(SEDirectiveSyncStopEngine)
 
         // 启动引擎，使用保存的音色配置
-        // val ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\"},\"tts\":{\"speaker\":\"${speaker}\"}".trimIndent()
         val ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\",\"extra\":{\"model\":\"2.2.0.0\", \"input_mod\": \"keep_alive\"}},\"tts\":{\"speaker\":\"$speaker\"}}"
 
         val ret = engine.sendDirective(SEDirectiveStartEngine, ttsConfig)
