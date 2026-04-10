@@ -249,18 +249,18 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
             SEEngineStart -> sendEvent("engine_start", data?.let { String(it) })
             SEEngineStop -> sendEvent("engine_stop", data?.let { String(it) })
             SEEngineError -> sendEvent("engine_error", data?.let { String(it) } ?: "Unknown error")
-            SEDialogASRInfo -> sendEvent("asr_start", null)
-            SEDialogASRResponse -> sendEvent("asr_result", data?.let { String(it) })
-            SEDialogASREnded -> sendEvent("asr_end", null)
-            SEDialogChatResponse -> sendEvent("chat_result", data?.let { String(it) })
-            SEDialogChatEnded -> sendEvent("chat_end", null)
-            SEDialogPlayerAudio -> data?.let { sendAudioEvent("player_audio", it) }
+            SEEventASRInfo -> sendEvent("asr_start", null)
+            SEEventASRResponse -> sendEvent("asr_result", data?.let { String(it) })
+            SEEventASREnded -> sendEvent("asr_end", null)
+            SEEventChatResponse -> sendEvent("chat_result", data?.let { String(it) })
+            SEEventChatEnded -> sendEvent("chat_end", null)
+            SEPlayerAudioData -> data?.let { sendAudioEvent("player_audio", it) }
             SEDecoderAudioData -> data?.let { sendAudioEvent("decoder_audio", it) }
             SERecorderAudioData -> data?.let { sendAudioEvent("recorder_audio", it) }
             else -> {}
         }
     }
-
+    
     private fun sendEvent(type: String, data: String?) {
         eventSink?.let { sink ->
             val event = mutableMapOf<String, Any>("type" to type)
