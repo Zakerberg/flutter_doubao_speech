@@ -364,7 +364,6 @@ extension DoubaoSpeechPlugin: SpeechEngineDelegate {
                 self.sendEvent(type: "asr_start", data: nil)
                 
             case SEEventASRResponse:
-//                self.sendEvent(type: "asr_result", data: String(data: data, encoding: .utf8))
                    // ASR 结果需要解析
                     if let jsonString = String(data: data, encoding: .utf8),
                        let jsonData = jsonString.data(using: .utf8),
@@ -381,7 +380,6 @@ extension DoubaoSpeechPlugin: SpeechEngineDelegate {
                 self.sendEvent(type: "asr_end", data: nil)
                 
             case SEEventChatResponse:
-//                self.sendEvent(type: "chat_result", data: String(data: data, encoding: .utf8))
                 // 提取 content 字段
                 if let jsonString = String(data: data, encoding: .utf8),
                    let jsonData = jsonString.data(using: .utf8),

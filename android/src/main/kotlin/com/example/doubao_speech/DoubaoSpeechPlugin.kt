@@ -330,12 +330,42 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
                 sendEvent("engine_error", data?.let { String(it) } ?: "Unknown error")
             SpeechEngineDefines.MESSAGE_TYPE_EVENT_ASR_INFO ->
                 sendEvent("asr_start", null)
-            SpeechEngineDefines.MESSAGE_TYPE_EVENT_ASR_RESPONSE ->
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_ASR_RESPONSE -> {
+            // ASR 结果需要解析
+            try {
+                  val jsonString = data?.let { String(it) }
+                  val jsonObject = JSONObject(jsonString ?: "")
+                  val results = jsonObject.optJSONArray("results")
+            if (results != null && results.length() > 0) {
+                  val firstResult = results.getJSONObject(0)
+                  val text = firstResult.optString("text")
+                sendEvent("asr_result", text)
+            } else {
+                sendEvent("asr_result", jsonString)
+            }
+               } catch (e: Exception) {
                 sendEvent("asr_result", data?.let { String(it) })
-            SpeechEngineDefines.MESSAGE_TYPE_EVENT_ASR_ENDED ->
+            }
+        }
+
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_ASR_ENDED -> 
                 sendEvent("asr_end", null)
-            SpeechEngineDefines.MESSAGE_TYPE_EVENT_CHAT_RESPONSE ->
+
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_CHAT_RESPONSE -> {
+            // 提取 content 字段
+            try {
+                  val jsonString = data?.let { String(it) }
+                  val jsonObject = JSONObject(jsonString ?: "")
+                  val content = jsonObject.optString("content")
+            if (content.isNotEmpty()) {
+                sendEvent("chat_result", content)
+            } else {
+                sendEvent("chat_result", jsonString)
+            }
+           } catch (e: Exception) {
                 sendEvent("chat_result", data?.let { String(it) })
+           }
+        }
             SpeechEngineDefines.MESSAGE_TYPE_EVENT_CHAT_ENDED ->
                 sendEvent("chat_end", null)
             SpeechEngineDefines.MESSAGE_TYPE_DIALOG_PLAYER_AUDIO ->
