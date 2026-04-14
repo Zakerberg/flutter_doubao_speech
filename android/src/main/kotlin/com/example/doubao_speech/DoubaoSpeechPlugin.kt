@@ -1,8 +1,11 @@
 package com.example.doubao_speech
 
+import android.app.Application
 import android.content.Context
 import android.util.Base64
-import com.bytedance.speechengine.*
+import com.bytedance.speech.speechengine.SpeechEngine
+import com.bytedance.speech.speechengine.SpeechEngineDefines
+import com.bytedance.speech.speechengine.SpeechEngineGenerator
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -26,12 +29,12 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         context = binding.applicationContext
         methodChannel = MethodChannel(binding.binaryMessenger, "doubao_speech/methods")
         eventChannel = EventChannel(binding.binaryMessenger, "doubao_speech/events")
-        
+
         methodChannel.setMethodCallHandler(this)
         eventChannel.setStreamHandler(this)
-        
-        // 初始化环境
-        SpeechEngine.prepareEnvironment(binding.applicationContext)
+
+        val ctx = binding.applicationContext
+        SpeechEngineGenerator.PrepareEnvironment(ctx, ctx as? Application)
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
@@ -50,12 +53,23 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
 
     private fun prepare(result: Result) {
         if (engine == null) {
-            engine = SpeechEngine()
-            engine?.createEngine(object : SpeechEngineDelegate {
-                override fun onMessage(type: SEMessageType, data: ByteArray?) {
-                    handleMessage(type, data)
+            val eng = SpeechEngineGenerator.getInstance()
+            val ctx = context
+            if (ctx != null) {
+                eng.setContext(ctx)
+            }
+            eng.setListener(object : SpeechEngine.SpeechListener {
+                override fun onSpeechMessage(type: Int, data: ByteArray?, length: Int) {
+                    val payload = when {
+                        data == null || length <= 0 -> null
+                        length > data.size -> data
+                        else -> data.copyOf(length)
+                    }
+                    handleMessage(type, payload)
                 }
             })
+            eng.createEngine()
+            engine = eng
         }
         result.success(true)
     }
@@ -74,83 +88,144 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
             }
         }
 
-        // 必需配置
-        engine.setStringParam(args?.get("engineName") as? String ?: "dialog",
-            SE_PARAMS_KEY_ENGINE_NAME_STRING)
-        engine.setStringParam(args?.get("appId") as? String ?: "",
-            SE_PARAMS_KEY_APP_ID_STRING)
-        engine.setStringParam(args?.get("appKey") as? String ?: "",
-            SE_PARAMS_KEY_APP_KEY_STRING)
-        engine.setStringParam(args?.get("token") as? String ?: "",
-            SE_PARAMS_KEY_APP_TOKEN_STRING)
-        engine.setStringParam(args?.get("resourceId") as? String ?: "volc.speech.dialog",
-            SE_PARAMS_KEY_RESOURCE_ID_STRING)
-        engine.setStringParam(args?.get("uid") as? String ?: "flutter_user",
-            SE_PARAMS_KEY_UID_STRING)
-        engine.setStringParam("wss://openspeech.bytedance.com",
-            SE_PARAMS_KEY_DIALOG_ADDRESS_STRING)
-        engine.setStringParam("/api/v3/realtime/dialogue",
-            SE_PARAMS_KEY_DIALOG_URI_STRING)
+        // 必需配置（0.0.14.x：setOptionString(key, value)）
+        engine.setOptionString(
+            SpeechEngineDefines.PARAMS_KEY_ENGINE_NAME_STRING,
+            args?.get("engineName") as? String ?: "dialog"
+        )
+        engine.setOptionString(
+            SpeechEngineDefines.PARAMS_KEY_APP_ID_STRING,
+            args?.get("appId") as? String ?: ""
+        )
+        engine.setOptionString(
+            SpeechEngineDefines.PARAMS_KEY_APP_KEY_STRING,
+            args?.get("appKey") as? String ?: ""
+        )
+        engine.setOptionString(
+            SpeechEngineDefines.PARAMS_KEY_APP_TOKEN_STRING,
+            args?.get("token") as? String ?: ""
+        )
+        engine.setOptionString(
+            SpeechEngineDefines.PARAMS_KEY_RESOURCE_ID_STRING,
+            args?.get("resourceId") as? String ?: "volc.speech.dialog"
+        )
+        engine.setOptionString(
+            SpeechEngineDefines.PARAMS_KEY_UID_STRING,
+            args?.get("uid") as? String ?: "flutter_user"
+        )
+        engine.setOptionString(
+            SpeechEngineDefines.PARAMS_KEY_DIALOG_ADDRESS_STRING,
+            "wss://openspeech.bytedance.com"
+        )
+        engine.setOptionString(
+            SpeechEngineDefines.PARAMS_KEY_DIALOG_URI_STRING,
+            "/api/v3/realtime/dialogue"
+        )
 
         // 日志配置
         args?.get("logPath")?.let {
-            engine.setStringParam(it as String, SE_PARAMS_KEY_DEBUG_PATH_STRING)
+            engine.setOptionString(
+                SpeechEngineDefines.PARAMS_KEY_DEBUG_PATH_STRING,
+                it as String
+            )
         }
         args?.get("logLevel")?.let {
-            engine.setStringParam(it as String, SE_PARAMS_KEY_LOG_LEVEL_STRING)
+            engine.setOptionString(
+                SpeechEngineDefines.PARAMS_KEY_LOG_LEVEL_STRING,
+                it as String
+            )
         }
 
         // AEC 配置（回声消除）
         val enableAEC = args?.get("enableAEC") as? Boolean ?: false
         if (enableAEC) {
-            engine.setBoolParam(true, SE_PARAMS_KEY_ENABLE_AEC_BOOL)
+            engine.setOptionBoolean(
+                SpeechEngineDefines.PARAMS_KEY_ENABLE_AEC_BOOL,
+                true
+            )
             args?.get("aecModelPath")?.let {
-                engine.setStringParam(it as String, SE_PARAMS_KEY_AEC_MODEL_PATH_STRING)
+                engine.setOptionString(
+                    SpeechEngineDefines.PARAMS_KEY_AEC_MODEL_PATH_STRING,
+                    it as String
+                )
             }
         }
 
         // 录音机配置
-        engine.setStringParam(SE_RECORDER_TYPE_RECORDER, SE_PARAMS_KEY_RECORDER_TYPE_STRING)
+        engine.setOptionString(
+            SpeechEngineDefines.PARAMS_KEY_RECORDER_TYPE_STRING,
+            SpeechEngineDefines.RECORDER_TYPE_RECORDER
+        )
         args?.get("recorderPath")?.let {
-            engine.setStringParam(it as String, SE_PARAMS_KEY_DIALOG_RECORDER_PATH_STRING)
+            engine.setOptionString(
+                SpeechEngineDefines.PARAMS_KEY_DIALOG_RECORDER_PATH_STRING,
+                it as String
+            )
         }
         args?.get("enableRecorderCallback")?.let {
-            engine.setBoolParam(it as Boolean, SE_PARAMS_KEY_DIALOG_ENABLE_RECORDER_AUDIO_CALLBACK_BOOL)
+            engine.setOptionBoolean(
+                SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_RECORDER_AUDIO_CALLBACK_BOOL,
+                it as Boolean
+            )
         }
 
         // 播放器配置
         args?.get("enablePlayer")?.let {
-            engine.setBoolParam(it as Boolean, SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL)
+            engine.setOptionBoolean(
+                SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL,
+                it as Boolean
+            )
         }
         args?.get("enablePlayerCallback")?.let {
-            engine.setBoolParam(it as Boolean, SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
+            engine.setOptionBoolean(
+                SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL,
+                it as Boolean
+            )
         }
         args?.get("enableDecoderCallback")?.let {
-            engine.setBoolParam(it as Boolean, SE_PARAMS_KEY_DIALOG_ENABLE_DECODER_AUDIO_CALLBACK_BOOL)
+            engine.setOptionBoolean(
+                SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_DECODER_AUDIO_CALLBACK_BOOL,
+                it as Boolean
+            )
         }
         args?.get("playerPath")?.let {
-            engine.setStringParam(it as String, SE_PARAMS_KEY_DIALOG_PLAYER_PATH_STRING)
+            engine.setOptionString(
+                SpeechEngineDefines.PARAMS_KEY_DIALOG_PLAYER_PATH_STRING,
+                it as String
+            )
         }
 
         // 工作模式配置（用于自定义 TTS）
         args?.get("workMode")?.let {
-            engine.setIntParam((it as Int).toLong(), SE_PARAMS_KEY_DIALOG_WORK_MODE_INT)
+            engine.setOptionInt(
+                SpeechEngineDefines.PARAMS_KEY_DIALOG_WORK_MODE_INT,
+                it as Int
+            )
         }
 
         // 重采样配置（自定义音频输入时使用）
         args?.get("enableResampler")?.let {
-            engine.setBoolParam(it as Boolean, SE_PARAMS_KEY_ENABLE_RESAMPLER_BOOL)
+            engine.setOptionBoolean(
+                SpeechEngineDefines.PARAMS_KEY_ENABLE_RESAMPLER_BOOL,
+                it as Boolean
+            )
         }
         args?.get("customSampleRate")?.let {
-            engine.setIntParam((it as Int).toLong(), SE_PARAMS_KEY_CUSTOM_SAMPLE_RATE_INT)
+            engine.setOptionInt(
+                SpeechEngineDefines.PARAMS_KEY_CUSTOM_SAMPLE_RATE_INT,
+                it as Int
+            )
         }
         args?.get("customChannel")?.let {
-            engine.setIntParam((it as Int).toLong(), SE_PARAMS_KEY_CUSTOM_CHANNEL_INT)
+            engine.setOptionInt(
+                SpeechEngineDefines.PARAMS_KEY_CUSTOM_CHANNEL_INT,
+                it as Int
+            )
         }
 
         // 初始化引擎
         val ret = engine.initEngine()
-        if (ret == SENoError) {
+        if (ret == SpeechEngineDefines.ERR_NO_ERROR) {
             isInitialized = true
             result.success(true)
         } else {
@@ -170,14 +245,15 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         }
 
         // 先同步停止
-        engine.sendDirective(SEDirectiveSyncStopEngine)
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_SYNC_STOP_ENGINE, "")
 
         // 启动引擎，使用保存的音色配置
-        val ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\",\"extra\":{\"model\":\"2.2.0.0\", \"input_mod\": \"keep_alive\"}},\"tts\":{\"speaker\":\"$speaker\"}}"
+        val ttsConfig =
+            "{\"dialog\":{\"bot_name\":\"豆包\",\"extra\":{\"model\":\"2.2.0.0\", \"input_mod\": \"keep_alive\"}},\"tts\":{\"speaker\":\"$speaker\"}}"
 
-        val ret = engine.sendDirective(SEDirectiveStartEngine, ttsConfig)
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, ttsConfig)
 
-        if (ret == SENoError) {
+        if (ret == SpeechEngineDefines.ERR_NO_ERROR) {
             result.success(true)
         } else {
             result.error("START_FAILED", "Start engine failed: $ret", null)
@@ -190,8 +266,8 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
             return
         }
 
-        val ret = engine.sendDirective(SEDirectiveSyncStopEngine)
-        result.success(ret == SENoError)
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_SYNC_STOP_ENGINE, "")
+        result.success(ret == SpeechEngineDefines.ERR_NO_ERROR)
     }
 
     private fun sayHello(call: MethodCall, result: Result) {
@@ -202,9 +278,9 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
 
         val content = call.arguments as? String ?: "我是你的AI助手，请问有什么可以帮你。"
         val data = buildContentPayload(content)
-        val ret = engine.sendDirective(SEDirectiveEventSayHello, data)
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_EVENT_SAY_HELLO, data)
 
-        if (ret == SENoError) {
+        if (ret == SpeechEngineDefines.ERR_NO_ERROR) {
             result.success(true)
         } else {
             result.error("SAY_HELLO_FAILED", "Say hello failed: $ret", null)
@@ -219,9 +295,9 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
 
         val content = call.arguments as? String ?: ""
         val data = buildContentPayload(content)
-        val ret = engine.sendDirective(SEDirectiveEventChatTextQuery, data)
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_EVENT_CHAT_TEXT_QUERY, data)
 
-        if (ret == SENoError) {
+        if (ret == SpeechEngineDefines.ERR_NO_ERROR) {
             result.success(true)
         } else {
             result.error("TEXT_QUERY_FAILED", "Text query failed: $ret", null)
@@ -244,23 +320,34 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         result.success(true)
     }
 
-    private fun handleMessage(type: SEMessageType, data: ByteArray?) {
+    private fun handleMessage(type: Int, data: ByteArray?) {
         when (type) {
-            SEEngineStart -> sendEvent("engine_start", data?.let { String(it) })
-            SEEngineStop -> sendEvent("engine_stop", data?.let { String(it) })
-            SEEngineError -> sendEvent("engine_error", data?.let { String(it) } ?: "Unknown error")
-            SEEventASRInfo -> sendEvent("asr_start", null)
-            SEEventASRResponse -> sendEvent("asr_result", data?.let { String(it) })
-            SEEventASREnded -> sendEvent("asr_end", null)
-            SEEventChatResponse -> sendEvent("chat_result", data?.let { String(it) })
-            SEEventChatEnded -> sendEvent("chat_end", null)
-            SEPlayerAudioData -> data?.let { sendAudioEvent("player_audio", it) }
-            SEDecoderAudioData -> data?.let { sendAudioEvent("decoder_audio", it) }
-            SERecorderAudioData -> data?.let { sendAudioEvent("recorder_audio", it) }
+            SpeechEngineDefines.MESSAGE_TYPE_ENGINE_START ->
+                sendEvent("engine_start", data?.let { String(it) })
+            SpeechEngineDefines.MESSAGE_TYPE_ENGINE_STOP ->
+                sendEvent("engine_stop", data?.let { String(it) })
+            SpeechEngineDefines.MESSAGE_TYPE_ENGINE_ERROR ->
+                sendEvent("engine_error", data?.let { String(it) } ?: "Unknown error")
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_ASR_INFO ->
+                sendEvent("asr_start", null)
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_ASR_RESPONSE ->
+                sendEvent("asr_result", data?.let { String(it) })
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_ASR_ENDED ->
+                sendEvent("asr_end", null)
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_CHAT_RESPONSE ->
+                sendEvent("chat_result", data?.let { String(it) })
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_CHAT_ENDED ->
+                sendEvent("chat_end", null)
+            SpeechEngineDefines.MESSAGE_TYPE_DIALOG_PLAYER_AUDIO ->
+                data?.let { sendAudioEvent("player_audio", it) }
+            SpeechEngineDefines.MESSAGE_TYPE_DECODER_AUDIO_DATA ->
+                data?.let { sendAudioEvent("decoder_audio", it) }
+            SpeechEngineDefines.MESSAGE_TYPE_DIALOG_RECORDER_AUDIO ->
+                data?.let { sendAudioEvent("recorder_audio", it) }
             else -> {}
         }
     }
-    
+
     private fun sendEvent(type: String, data: String?) {
         eventSink?.let { sink ->
             val event = mutableMapOf<String, Any>("type" to type)
