@@ -374,6 +374,49 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
                 data?.let { sendAudioEvent("decoder_audio", it) }
             SpeechEngineDefines.MESSAGE_TYPE_DIALOG_RECORDER_AUDIO ->
                 data?.let { sendAudioEvent("recorder_audio", it) }
+                // SEPlayerStartPlayAudio (3019)
+            SpeechEngineDefines.MESSAGE_TYPE_PLAYER_START_PLAY_AUDIO ->
+                sendEvent("player_start_play_audio", null)
+            
+            // SEPlayerFinishPlayAudio (3020)
+            SpeechEngineDefines.MESSAGE_TYPE_PLAYER_FINISH_PLAY_AUDIO ->
+                sendEvent("player_finish_play_audio", null)
+            
+            // SETtsStartPlaying (1401)
+            SpeechEngineDefines.MESSAGE_TYPE_TTS_START_PLAYING ->
+                sendEvent("tts_start_playing", null)
+            
+            // SETtsFinishPlaying (1402)
+            SpeechEngineDefines.MESSAGE_TYPE_TTS_FINISH_PLAYING ->
+                sendEvent("tts_finish_playing", null)
+            
+            // SETtsAudioDataEnd (1409)
+            SpeechEngineDefines.MESSAGE_TYPE_TTS_AUDIO_DATA_END ->
+                sendEvent("tts_audio_data_end", null)
+            
+            // SETtsSynthesisBegin (1403)
+            SpeechEngineDefines.MESSAGE_TYPE_TTS_SYNTHESIS_BEGIN ->
+                sendEvent("tts_synthesis_begin", null)
+            
+            // SETtsSynthesisEnd (1404)
+            SpeechEngineDefines.MESSAGE_TYPE_TTS_SYNTHESIS_END ->
+                sendEvent("tts_synthesis_end", null)
+            
+            // SEEventTTSEnded (3011)
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_TTS_ENDED ->
+                sendEvent("tts_ended", null)
+            
+            // SEEventTTSSentenceStart (3008)
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_TTS_SENTENCE_START ->
+                sendEvent("tts_sentence_start", data?.let { String(it) })
+            
+            // SEEventTTSSentenceEnd (3009)
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_TTS_SENTENCE_END ->
+                sendEvent("tts_sentence_end", data?.let { String(itÏ) })
+            
+            // SEEventSessionStarted (3003)
+            SpeechEngineDefines.MESSAGE_TYPE_EVENT_SESSION_STARTED ->
+                sendEvent("session_started", data?.let { String(it) })
             else -> {}
         }
     }
