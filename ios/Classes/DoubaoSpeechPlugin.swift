@@ -402,7 +402,31 @@ extension DoubaoSpeechPlugin: SpeechEngineDelegate {
             case SERecorderAudioData:
                 self.sendAudioEvent(type: "recorder_audio", audioData: data)
                 
+            case SEPlayerStartPlayAudio:
+                self.sendEvent(type: "player_start_play_audio", data: nil)
+                            
+            case SEPlayerFinishPlayAudio:
+                self.sendEvent(type: "player_finish_play_audio", data: nil)
+                            
+            case SETtsStartPlaying:
+                self.sendEvent(type: "tts_start_playing", data: nil)
+                            
+            case SETtsFinishPlaying:
+                self.sendEvent(type: "tts_finish_playing", data: nil)
+                            
+            case SETtsAudioDataEnd:
+                self.sendEvent(type: "tts_audio_data_end", data: nil)
+                            
+            // 可选：添加更多调试事件
+            case SETtsSynthesisBegin:
+                self.sendEvent(type: "tts_synthesis_begin", data: nil)
+                            
+            case SETtsSynthesisEnd:
+                self.sendEvent(type: "tts_synthesis_end", data: nil)
+                            
             default:
+                // 打印未处理的事件类型，用于调试
+                print("🔔 收到未处理的事件: type=\(type.rawValue), dataSize=\(data.count)")
                 break
             }
         }
