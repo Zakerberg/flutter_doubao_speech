@@ -47,4 +47,21 @@ class SpeechEvent {
   /// Recorder audio callback
   factory SpeechEvent.recorderAudio(Uint8List audio) =>
       SpeechEvent._('recorder_audio', audio: audio);
+
+  /// Player starts playing audio (对应 SEPlayerStartPlayAudio = 3019)
+  factory SpeechEvent.playerStartPlayAudio() =>
+      SpeechEvent._('player_start_play_audio');
+
+  /// Player finishes playing audio (对应 SEPlayerFinishPlayAudio = 3020)
+  factory SpeechEvent.playerFinishPlayAudio() =>
+      SpeechEvent._('player_finish_play_audio');
+
+  /// TTS engine starts playing (对应 SETtsStartPlaying = 1401)
+  factory SpeechEvent.ttsStartPlaying() => SpeechEvent._('tts_start_playing');
+
+  /// TTS engine finishes playing (对应 SETtsFinishPlaying = 1402)
+  factory SpeechEvent.ttsFinishPlaying() => SpeechEvent._('tts_finish_playing');
+
+  /// TTS audio data end (对应 SETtsAudioDataEnd = 1409)
+  factory SpeechEvent.ttsAudioDataEnd() => SpeechEvent._('tts_audio_data_end');
 }

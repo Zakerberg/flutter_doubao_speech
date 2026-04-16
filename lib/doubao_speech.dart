@@ -65,6 +65,21 @@ class DoubaoSpeech {
           final audioBytes = base64Decode(audioBase64);
           _eventController?.add(SpeechEvent.recorderAudio(audioBytes));
           break;
+        case 'player_start_play_audio':
+          _eventController?.add(SpeechEvent.playerStartPlayAudio());
+          break;
+        case 'player_finish_play_audio':
+          _eventController?.add(SpeechEvent.playerFinishPlayAudio());
+          break;
+        case 'tts_start_playing':
+          _eventController?.add(SpeechEvent.ttsStartPlaying());
+          break;
+        case 'tts_finish_playing':
+          _eventController?.add(SpeechEvent.ttsFinishPlaying());
+          break;
+        case 'tts_audio_data_end':
+          _eventController?.add(SpeechEvent.ttsAudioDataEnd());
+          break;
       }
     });
 
