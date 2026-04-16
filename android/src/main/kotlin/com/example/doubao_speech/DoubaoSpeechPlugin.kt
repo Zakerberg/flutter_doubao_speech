@@ -412,7 +412,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
             
             // SEEventTTSSentenceEnd (3009)
             SpeechEngineDefines.MESSAGE_TYPE_EVENT_TTS_SENTENCE_END ->
-                sendEvent("tts_sentence_end", data?.let { String(itÏ) })
+                sendEvent("tts_sentence_end", data?.let { String(it) })
             
             // SEEventSessionStarted (3003)
             SpeechEngineDefines.MESSAGE_TYPE_EVENT_SESSION_STARTED ->
