@@ -80,6 +80,18 @@ class DoubaoSpeech {
         case 'tts_audio_data_end':
           _eventController?.add(SpeechEvent.ttsAudioDataEnd());
           break;
+        case 'tts_ended':
+          _eventController?.add(SpeechEvent.ttsEnded());
+          break;
+        case 'tts_sentence_start':
+          _eventController?.add(SpeechEvent.ttsSentenceStart(map['data']));
+          break;
+        case 'tts_sentence_end':
+          _eventController?.add(SpeechEvent.ttsSentenceEnd(map['data']));
+          break;
+        case 'session_started':
+          _eventController?.add(SpeechEvent.sessionStarted(map['data']));
+          break;
       }
     });
 

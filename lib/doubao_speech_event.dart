@@ -64,4 +64,19 @@ class SpeechEvent {
 
   /// TTS audio data end (对应 SETtsAudioDataEnd = 1409)
   factory SpeechEvent.ttsAudioDataEnd() => SpeechEvent._('tts_audio_data_end');
+
+  /// TTS 播放结束 (对应 SEEventTTSEnded = 3011)
+  factory SpeechEvent.ttsEnded() => SpeechEvent._('tts_ended');
+
+  /// TTS 句子开始播放 (对应 SEEventTTSSentenceStart = 3008)
+  factory SpeechEvent.ttsSentenceStart(String? data) =>
+      SpeechEvent._('tts_sentence_start', text: data);
+
+  /// TTS 句子播放结束 (对应 SEEventTTSSentenceEnd = 3009)
+  factory SpeechEvent.ttsSentenceEnd(String? data) =>
+      SpeechEvent._('tts_sentence_end', text: data);
+
+  /// 会话开始 (对应 SEEventSessionStarted = 3003)
+  factory SpeechEvent.sessionStarted(String? data) =>
+      SpeechEvent._('session_started', text: data);
 }

@@ -423,6 +423,18 @@ extension DoubaoSpeechPlugin: SpeechEngineDelegate {
                             
             case SETtsSynthesisEnd:
                 self.sendEvent(type: "tts_synthesis_end", data: nil)
+                
+            case SEEventTTSEnded:  // 3011
+                self.sendEvent(type: "tts_ended", data: nil)
+                            
+            case SEEventTTSSentenceStart:  // 3008
+                self.sendEvent(type: "tts_sentence_start", data: String(data: data, encoding: .utf8))
+                            
+            case SEEventTTSSentenceEnd:  // 3009
+                self.sendEvent(type: "tts_sentence_end", data: String(data: data, encoding: .utf8))
+                            
+            case SEEventSessionStarted:  // 3003
+                self.sendEvent(type: "session_started", data: String(data: data, encoding: .utf8))
                             
             default:
                 // 打印未处理的事件类型，用于调试
