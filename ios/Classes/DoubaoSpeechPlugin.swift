@@ -200,10 +200,14 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         // ✅ 1. Engine Name - 使用 BiTTS
         engine.setStringParam(SE_BITTS_ENGINE, forKey: SE_PARAMS_KEY_ENGINE_NAME_STRING)
         
-        // ✅ 2. 鉴权信息
-        engine.setStringParam(args["appId"] as? String ?? "", forKey: SE_PARAMS_KEY_APP_ID_STRING)
-        engine.setStringParam(args["appKey"] as? String ?? "", forKey: SE_PARAMS_KEY_APP_KEY_STRING)
-        engine.setStringParam(args["token"] as? String ?? "", forKey: SE_PARAMS_KEY_APP_TOKEN_STRING)
+        // ✅ 2. 鉴权信息（必须有值）
+        let appId = args["appId"] as? String ?? ""
+        let appKey = args["appKey"] as? String ?? ""
+        let token = args["token"] as? String ?? ""
+        
+        engine.setStringParam(appId, forKey: SE_PARAMS_KEY_APP_ID_STRING)
+        engine.setStringParam(appKey, forKey: SE_PARAMS_KEY_APP_KEY_STRING)
+        engine.setStringParam(token, forKey: SE_PARAMS_KEY_APP_TOKEN_STRING)
         engine.setStringParam(args["uid"] as? String ?? "flutter_user", forKey: SE_PARAMS_KEY_UID_STRING)
         
         // ✅ 3. Resource ID
@@ -222,7 +226,20 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         // ✅ 6. 启用播放器音频回调（SETtsDataCallbackModeAll = 2）
         engine.setIntParam(2, forKey: SE_PARAMS_KEY_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
         
-        // ✅ 7. 可选：日志配置
+        // ✅ 7. 【关键】必须设置 START_ENGINE_PAYLOAD
+        let startPayload = """
+        {
+            "user": {
+                "uid": "\(args["uid"] as? String ?? "flutter_user")"
+            },
+            "req_params": {
+                "speaker": "\(speaker)"
+            }
+        }
+        """
+        engine.setStringParam(startPayload, forKey: SE_PARAMS_KEY_START_ENGINE_PAYLOAD_STRING)
+        
+        // ✅ 8. 可选：日志配置
         if let logPath = args["logPath"] as? String, !logPath.isEmpty {
             engine.setStringParam(logPath, forKey: SE_PARAMS_KEY_DEBUG_PATH_STRING)
         }
@@ -230,13 +247,20 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
             engine.setStringParam(logLevel, forKey: SE_PARAMS_KEY_LOG_LEVEL_STRING)
         }
         
+        // ✅ 9. 可选：连接超时
+        engine.setIntParam(10000, forKey: SE_PARAMS_KEY_TTS_CONN_TIMEOUT_INT)
+        
         // 初始化引擎
         let ret = engine.initEngine()
+        print("[DoubaoSpeech] initEngine result: \(ret.rawValue)")
+        
         if ret == SENoError {
             isInitialized = true
             result(true)
         } else {
-            result(FlutterError(code: "INIT_FAILED", message: "Init failed: \(ret)", details: nil))
+            result(FlutterError(code: "INIT_FAILED",
+                                message: "Init failed: \(ret.rawValue)",
+                                details: nil))
         }
     }
 
@@ -249,21 +273,10 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         // 先同步停止
         engine.send(SEDirectiveSyncStopEngine)
         
-        // ✅ 在 StartEngine 时传入 payload
-        let startPayload = """
-        {
-            "user": {
-                "uid": "flutter_user"
-            },
-            "req_params": {
-                "speaker": "\(speaker)"
-            }
-        }
-        """
-        
-        let ret1 = engine.send(SEDirectiveStartEngine, data: startPayload)
+        // ✅ 启动引擎（payload 已在 initEngine 时设置）
+        let ret1 = engine.send(SEDirectiveStartEngine, data: "")
         if ret1 != SENoError {
-            result(FlutterError(code: "START_FAILED", message: "Start engine failed: \(ret1)", details: nil))
+            result(FlutterError(code: "START_FAILED", message: "Start engine failed: \(ret1.rawValue)", details: nil))
             return
         }
         
@@ -272,7 +285,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         if ret2 == SENoError {
             result(true)
         } else {
-            result(FlutterError(code: "SESSION_FAILED", message: "Start session failed: \(ret2)", details: nil))
+            result(FlutterError(code: "SESSION_FAILED", message: "Start session failed: \(ret2.rawValue)", details: nil))
         }
     }
     
