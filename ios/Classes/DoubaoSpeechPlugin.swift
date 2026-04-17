@@ -192,40 +192,43 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        // ✅ 1. 使用 BiTTS Engine（不是 Dialog）
+        // 保存音色配置
+        if let speakerValue = args["speaker"] as? String, !speakerValue.isEmpty {
+            speaker = speakerValue
+        }
+        
+        // ✅ 1. Engine Name - 使用 BiTTS
         engine.setStringParam(SE_BITTS_ENGINE, forKey: SE_PARAMS_KEY_ENGINE_NAME_STRING)
         
-        // ✅ 2. Resource ID 使用 volc.service_type.10029
+        // ✅ 2. 鉴权信息
+        engine.setStringParam(args["appId"] as? String ?? "", forKey: SE_PARAMS_KEY_APP_ID_STRING)
+        engine.setStringParam(args["appKey"] as? String ?? "", forKey: SE_PARAMS_KEY_APP_KEY_STRING)
+        engine.setStringParam(args["token"] as? String ?? "", forKey: SE_PARAMS_KEY_APP_TOKEN_STRING)
+        engine.setStringParam(args["uid"] as? String ?? "flutter_user", forKey: SE_PARAMS_KEY_UID_STRING)
+        
+        // ✅ 3. Resource ID
         engine.setStringParam(args["resourceId"] as? String ?? "volc.service_type.10029",
                               forKey: SE_PARAMS_KEY_RESOURCE_ID_STRING)
         
-        // ✅ 3. TTS 服务地址（不是 Dialog 地址）
+        // ✅ 4. TTS 服务地址和 URI
         engine.setStringParam("wss://openspeech.bytedance.com",
-                              forKey: SE_PARAMS_KEY_TTS_ADDRESS_STRING)  // 注意是 TTS_ADDRESS
-        
-        // ✅ 4. TTS URI
+                              forKey: SE_PARAMS_KEY_TTS_ADDRESS_STRING)
         engine.setStringParam("/api/v3/tts/bidirection",
-                              forKey: SE_PARAMS_KEY_TTS_URI_STRING)  // 注意是 TTS_URI
+                              forKey: SE_PARAMS_KEY_TTS_URI_STRING)
         
-        // 鉴权信息
-        engine.setStringParam(args["appId"] as? String ?? "",
-                              forKey: SE_PARAMS_KEY_APP_ID_STRING)
-        engine.setStringParam(args["appKey"] as? String ?? "",
-                              forKey: SE_PARAMS_KEY_APP_KEY_STRING)
-        engine.setStringParam(args["token"] as? String ?? "",
-                              forKey: SE_PARAMS_KEY_APP_TOKEN_STRING)
-        engine.setStringParam(args["uid"] as? String ?? "flutter_user",
-                              forKey: SE_PARAMS_KEY_UID_STRING)
-        
-        // ✅ 5. 启用播放器
+        // ✅ 5. 播放器配置
         engine.setBoolParam(true, forKey: SE_PARAMS_KEY_TTS_ENABLE_PLAYER_BOOL)
         
-        // ✅ 6. 启用播放器音频回调（这样才会收到 player_finish_play_audio）
-        engine.setIntParam(2, forKey: SE_PARAMS_KEY_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)  // SETtsDataCallbackModeAll = 2
+        // ✅ 6. 启用播放器音频回调（SETtsDataCallbackModeAll = 2）
+        engine.setIntParam(2, forKey: SE_PARAMS_KEY_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
         
-        // ✅ 7. StartEngine 时需要传入 payload
-        let startPayload = "{\"user\":{\"uid\":\"\(args["uid"] ?? "flutter_user")\"},\"req_params\":{\"speaker\":\"\(speaker)\"}}"
-        engine.setStringParam(startPayload, forKey: SE_PARAMS_KEY_START_ENGINE_PAYLOAD_STRING)
+        // ✅ 7. 可选：日志配置
+        if let logPath = args["logPath"] as? String, !logPath.isEmpty {
+            engine.setStringParam(logPath, forKey: SE_PARAMS_KEY_DEBUG_PATH_STRING)
+        }
+        if let logLevel = args["logLevel"] as? String {
+            engine.setStringParam(logLevel, forKey: SE_PARAMS_KEY_LOG_LEVEL_STRING)
+        }
         
         // 初始化引擎
         let ret = engine.initEngine()
@@ -234,6 +237,42 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
             result(true)
         } else {
             result(FlutterError(code: "INIT_FAILED", message: "Init failed: \(ret)", details: nil))
+        }
+    }
+
+    private func startEngine(result: @escaping FlutterResult) {
+        guard let engine = engine, isInitialized else {
+            result(FlutterError(code: "ENGINE_NOT_INIT", message: "Engine not initialized", details: nil))
+            return
+        }
+        
+        // 先同步停止
+        engine.send(SEDirectiveSyncStopEngine)
+        
+        // ✅ 在 StartEngine 时传入 payload
+        let startPayload = """
+        {
+            "user": {
+                "uid": "flutter_user"
+            },
+            "req_params": {
+                "speaker": "\(speaker)"
+            }
+        }
+        """
+        
+        let ret1 = engine.send(SEDirectiveStartEngine, data: startPayload)
+        if ret1 != SENoError {
+            result(FlutterError(code: "START_FAILED", message: "Start engine failed: \(ret1)", details: nil))
+            return
+        }
+        
+        // 开始 Session
+        let ret2 = engine.send(SEDirectiveEventStartSession, data: "")
+        if ret2 == SENoError {
+            result(true)
+        } else {
+            result(FlutterError(code: "SESSION_FAILED", message: "Start session failed: \(ret2)", details: nil))
         }
     }
     
@@ -332,7 +371,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
     private func sayHello(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let engine = engine else { return }
         
-        let content = call.arguments as? String ?? "你好,我是你的Angela，请问有什么可以帮你。"
+        let content = call.arguments as? String ?? "你好,我是你的Angala，请问有什么可以帮你。"
         
         // 发送合成文本
         let taskJson = "{\"req_params\":{\"text\":\"\(content)\"}}"
