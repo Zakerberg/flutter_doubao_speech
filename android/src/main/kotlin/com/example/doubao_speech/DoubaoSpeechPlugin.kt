@@ -15,6 +15,9 @@ import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.EventChannel.StreamHandler
 import io.flutter.plugin.common.EventChannel.EventSink
 import org.json.JSONObject
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 
 class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
     private lateinit var methodChannel: MethodChannel
@@ -433,17 +436,15 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
 //            data?.let { event["data"] = it }
 //            sink.success(event)
 //        }
-        // 确保在主线程发送事件
-        Handler(Looper.getMainLooper()).post {
-            try {
-                eventSink?.success(mapOf(
-                    "type" to type,
-                    "text" to text
-                ))
-            } catch (e: Exception) {
-                Log.e("DoubaoSpeech", "Failed to send event", e)
-            }
+
+       // 确保在主线程发送事件
+       Handler(Looper.getMainLooper()).post {
+        eventSink?.let { sink ->
+            val event = mutableMapOf<String, Any>("type" to type)
+            data?.let { event["data"] = it }
+            sink.success(event)
         }
+      }
     }
 
     private fun sendAudioEvent(type: String, data: ByteArray) {
