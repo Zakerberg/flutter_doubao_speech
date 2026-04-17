@@ -313,40 +313,40 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
 //                                details: nil))
 //        }
 //    }
-    private func startEngine(result: @escaping FlutterResult) {
-        guard let engine = engine, isInitialized else {
-            result(FlutterError(code: "ENGINE_NOT_INIT", message: "Engine not initialized", details: nil))
-            return
-        }
-        
-        // 1. 先同步停止
-        engine.send(SEDirectiveSyncStopEngine)
-        
-        // 2. 启动引擎（建连）
-        let ret1 = engine.send(SEDirectiveStartEngine, data: "")
-        if ret1 != SENoError {
-            result(FlutterError(code: "START_FAILED", message: "Start failed: \(ret1)", details: nil))
-            return
-        }
-        
-        // 3. 开始 Session
-        let ret2 = engine.send(SEDirectiveEventStartSession, data: "")
-        if ret2 == SENoError {
-            result(true)
-        } else {
-            result(FlutterError(code: "SESSION_FAILED", message: "Session failed: \(ret2)", details: nil))
-        }
-    }
-    
-    private func stopEngine(result: @escaping FlutterResult) {
-        guard let engine = engine else {
-            result(false)
-            return
-        }
-        
-        let ret = engine.send(SEDirectiveSyncStopEngine)
-        result(ret == SENoError)
-    }
+//    private func startEngine(result: @escaping FlutterResult) {
+//        guard let engine = engine, isInitialized else {
+//            result(FlutterError(code: "ENGINE_NOT_INIT", message: "Engine not initialized", details: nil))
+//            return
+//        }
+//        
+//        // 1. 先同步停止
+//        engine.send(SEDirectiveSyncStopEngine)
+//        
+//        // 2. 启动引擎（建连）
+//        let ret1 = engine.send(SEDirectiveStartEngine, data: "")
+//        if ret1 != SENoError {
+//            result(FlutterError(code: "START_FAILED", message: "Start failed: \(ret1)", details: nil))
+//            return
+//        }
+//        
+//        // 3. 开始 Session
+//        let ret2 = engine.send(SEDirectiveEventStartSession, data: "")
+//        if ret2 == SENoError {
+//            result(true)
+//        } else {
+//            result(FlutterError(code: "SESSION_FAILED", message: "Session failed: \(ret2)", details: nil))
+//        }
+//    }
+//    
+//    private func stopEngine(result: @escaping FlutterResult) {
+//        guard let engine = engine else {
+//            result(false)
+//            return
+//        }
+//        
+//        let ret = engine.send(SEDirectiveSyncStopEngine)
+//        result(ret == SENoError)
+//    }
     
 //    private func sayHello(call: FlutterMethodCall, result: @escaping FlutterResult) {
 //        guard let engine = engine, isInitialized else {
