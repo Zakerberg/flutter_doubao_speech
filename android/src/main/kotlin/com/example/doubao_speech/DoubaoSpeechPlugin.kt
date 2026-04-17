@@ -182,12 +182,12 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
                 it as Boolean
             )
         }
-        args?.get("enablePlayerCallback")?.let {
-            engine.setOptionBoolean(
-                SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL,
-                it as Boolean
-            )
-        }
+        // args?.get("enablePlayerCallback")?.let {
+        //     engine.setOptionBoolean(
+        //         SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL,
+        //         it as Boolean
+        //     )
+        // }
         args?.get("enableDecoderCallback")?.let {
             engine.setOptionBoolean(
                 SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_DECODER_AUDIO_CALLBACK_BOOL,

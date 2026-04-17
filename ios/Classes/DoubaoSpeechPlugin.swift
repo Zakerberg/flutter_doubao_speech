@@ -134,10 +134,10 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         if let enablePlayer = args["enablePlayer"] as? Bool {
             engine.setBoolParam(enablePlayer, forKey: SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL)
         }
-        if let enablePlayerCallback = args["enablePlayerCallback"] as? Bool {
-            engine.setBoolParam(enablePlayerCallback,
-                                forKey: SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
-        }
+        // if let enablePlayerCallback = args["enablePlayerCallback"] as? Bool {
+        //     engine.setBoolParam(enablePlayerCallback,
+        //                         forKey: SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
+        // }
         if let enableDecoderCallback = args["enableDecoderCallback"] as? Bool {
             engine.setBoolParam(enableDecoderCallback,
                                 forKey: SE_PARAMS_KEY_DIALOG_ENABLE_DECODER_AUDIO_CALLBACK_BOOL)
