@@ -69,110 +69,163 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         result(true)
     }
     
+//    private func initEngine(call: FlutterMethodCall, result: @escaping FlutterResult) {
+//        guard let args = call.arguments as? [String: Any],
+//              let engine = engine else {
+//            result(FlutterError(code: "INVALID_ARGS",
+//                                message: "Invalid arguments or engine not prepared",
+//                                details: nil))
+//            return
+//        }
+//        
+//        // 保存音色配置
+//        if let speakerValue = args["speaker"] as? String, !speakerValue.isEmpty {
+//            speaker = speakerValue
+//        }
+//        
+//        // 必需配置
+//        engine.setStringParam(args["engineName"] as? String ?? "dialog",
+//                              forKey: SE_PARAMS_KEY_ENGINE_NAME_STRING)
+//        engine.setStringParam(args["appId"] as? String ?? "",
+//                              forKey: SE_PARAMS_KEY_APP_ID_STRING)
+//        engine.setStringParam(args["appKey"] as? String ?? "",
+//                              forKey: SE_PARAMS_KEY_APP_KEY_STRING)
+//        engine.setStringParam(args["token"] as? String ?? "",
+//                              forKey: SE_PARAMS_KEY_APP_TOKEN_STRING)
+//        engine.setStringParam(args["resourceId"] as? String ?? "volc.speech.dialog",
+//                              forKey: SE_PARAMS_KEY_RESOURCE_ID_STRING)
+//        engine.setStringParam(args["uid"] as? String ?? "flutter_user",
+//                              forKey: SE_PARAMS_KEY_UID_STRING)
+//        engine.setStringParam("wss://openspeech.bytedance.com",
+//                              forKey: SE_PARAMS_KEY_DIALOG_ADDRESS_STRING)
+//        engine.setStringParam("/api/v3/realtime/dialogue",
+//                              forKey: SE_PARAMS_KEY_DIALOG_URI_STRING)
+//        
+//        // 日志配置
+//        if let logPath = args["logPath"] as? String, !logPath.isEmpty {
+//            engine.setStringParam(logPath, forKey: SE_PARAMS_KEY_DEBUG_PATH_STRING)
+//        }
+//        if let logLevel = args["logLevel"] as? String {
+//            engine.setStringParam(logLevel, forKey: SE_PARAMS_KEY_LOG_LEVEL_STRING)
+//        }
+//        
+//        // AEC 配置（回声消除）
+//        if let enableAEC = args["enableAEC"] as? Bool, enableAEC {
+//            engine.setBoolParam(true, forKey: SE_PARAMS_KEY_ENABLE_AEC_BOOL)
+//            if let aecModelPath = args["aecModelPath"] as? String, !aecModelPath.isEmpty {
+//                engine.setStringParam(aecModelPath, forKey: SE_PARAMS_KEY_AEC_MODEL_PATH_STRING)
+//            }
+//        }
+//        
+//        // 录音机配置
+//        engine.setStringParam(SE_RECORDER_TYPE_RECORDER, forKey: SE_PARAMS_KEY_RECORDER_TYPE_STRING)
+//        if let recorderPath = args["recorderPath"] as? String, !recorderPath.isEmpty {
+//            engine.setStringParam(recorderPath, forKey: SE_PARAMS_KEY_DIALOG_RECORDER_PATH_STRING)
+//        }
+//        if let enableRecorderCallback = args["enableRecorderCallback"] as? Bool {
+//            engine.setBoolParam(enableRecorderCallback,
+//                                forKey: SE_PARAMS_KEY_DIALOG_ENABLE_RECORDER_AUDIO_CALLBACK_BOOL)
+//        }
+//        
+//        // 播放器配置
+//        engine.setBoolParam(true, forKey: SE_PARAMS_KEY_TTS_ENABLE_PLAYER_BOOL)
+//        // 在初始化引擎后设置
+//        engine.setBoolParam(true, forKey: SE_PARAMS_KEY_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
+//        if let enablePlayer = args["enablePlayer"] as? Bool {
+//            engine.setBoolParam(enablePlayer, forKey: SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL)
+//        }
+//        // if let enablePlayerCallback = args["enablePlayerCallback"] as? Bool {
+//        //     engine.setBoolParam(enablePlayerCallback,
+//        //                         forKey: SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
+//        // }
+//        if let enableDecoderCallback = args["enableDecoderCallback"] as? Bool {
+//            engine.setBoolParam(enableDecoderCallback,
+//                                forKey: SE_PARAMS_KEY_DIALOG_ENABLE_DECODER_AUDIO_CALLBACK_BOOL)
+//        }
+//        if let playerPath = args["playerPath"] as? String, !playerPath.isEmpty {
+//            engine.setStringParam(playerPath, forKey: SE_PARAMS_KEY_DIALOG_PLAYER_PATH_STRING)
+//        }
+//        
+//        // 工作模式配置（用于自定义 TTS）
+//        if let workMode = args["workMode"] as? Int {
+//            engine.setIntParam(workMode, forKey: SE_PARAMS_KEY_DIALOG_WORK_MODE_INT)
+//        }
+//        
+//        // 重采样配置（自定义音频输入时使用）
+//        if let enableResampler = args["enableResampler"] as? Bool {
+//            engine.setBoolParam(enableResampler, forKey: SE_PARAMS_KEY_ENABLE_RESAMPLER_BOOL)
+//        }
+//        if let customSampleRate = args["customSampleRate"] as? Int {
+//            engine.setIntParam(customSampleRate, forKey: SE_PARAMS_KEY_CUSTOM_SAMPLE_RATE_INT)
+//        }
+//        if let customChannel = args["customChannel"] as? Int {
+//            engine.setIntParam(customChannel, forKey: SE_PARAMS_KEY_CUSTOM_CHANNEL_INT)
+//        }
+//        
+//        
+//        // 确保 AudioSession 仍然是激活状态
+//            let session = AVAudioSession.sharedInstance()
+//            do {
+//                if !session.isOtherAudioPlaying {
+//                    try session.setActive(true, options: [])
+//                }
+//                logAudioSessionState("before_init_engine")
+//            } catch {
+//                print("[DoubaoSpeech] Failed to reactivate AudioSession: \(error)")
+//            }
+//        
+//        // 初始化引擎
+//        let ret = engine.initEngine()
+//        if ret == SENoError {
+//            isInitialized = true
+//            result(true)
+//        } else {
+//            result(FlutterError(code: "INIT_FAILED",
+//                                message: "Init engine failed: \(ret)",
+//                                details: nil))
+//        }
+//    }
     private func initEngine(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],
               let engine = engine else {
-            result(FlutterError(code: "INVALID_ARGS",
-                                message: "Invalid arguments or engine not prepared",
-                                details: nil))
+            result(FlutterError(code: "INVALID_ARGS", message: "Invalid arguments", details: nil))
             return
         }
         
-        // 保存音色配置
-        if let speakerValue = args["speaker"] as? String, !speakerValue.isEmpty {
-            speaker = speakerValue
-        }
+        // ✅ 1. 使用 BiTTS Engine（不是 Dialog）
+        engine.setStringParam(SE_BITTS_ENGINE, forKey: SE_PARAMS_KEY_ENGINE_NAME_STRING)
         
-        // 必需配置
-        engine.setStringParam(args["engineName"] as? String ?? "dialog",
-                              forKey: SE_PARAMS_KEY_ENGINE_NAME_STRING)
+        // ✅ 2. Resource ID 使用 volc.service_type.10029
+        engine.setStringParam(args["resourceId"] as? String ?? "volc.service_type.10029",
+                              forKey: SE_PARAMS_KEY_RESOURCE_ID_STRING)
+        
+        // ✅ 3. TTS 服务地址（不是 Dialog 地址）
+        engine.setStringParam("wss://openspeech.bytedance.com",
+                              forKey: SE_PARAMS_KEY_TTS_ADDRESS_STRING)  // 注意是 TTS_ADDRESS
+        
+        // ✅ 4. TTS URI
+        engine.setStringParam("/api/v3/tts/bidirection",
+                              forKey: SE_PARAMS_KEY_TTS_URI_STRING)  // 注意是 TTS_URI
+        
+        // 鉴权信息
         engine.setStringParam(args["appId"] as? String ?? "",
                               forKey: SE_PARAMS_KEY_APP_ID_STRING)
         engine.setStringParam(args["appKey"] as? String ?? "",
                               forKey: SE_PARAMS_KEY_APP_KEY_STRING)
         engine.setStringParam(args["token"] as? String ?? "",
                               forKey: SE_PARAMS_KEY_APP_TOKEN_STRING)
-        engine.setStringParam(args["resourceId"] as? String ?? "volc.speech.dialog",
-                              forKey: SE_PARAMS_KEY_RESOURCE_ID_STRING)
         engine.setStringParam(args["uid"] as? String ?? "flutter_user",
                               forKey: SE_PARAMS_KEY_UID_STRING)
-        engine.setStringParam("wss://openspeech.bytedance.com",
-                              forKey: SE_PARAMS_KEY_DIALOG_ADDRESS_STRING)
-        engine.setStringParam("/api/v3/realtime/dialogue",
-                              forKey: SE_PARAMS_KEY_DIALOG_URI_STRING)
         
-        // 日志配置
-        if let logPath = args["logPath"] as? String, !logPath.isEmpty {
-            engine.setStringParam(logPath, forKey: SE_PARAMS_KEY_DEBUG_PATH_STRING)
-        }
-        if let logLevel = args["logLevel"] as? String {
-            engine.setStringParam(logLevel, forKey: SE_PARAMS_KEY_LOG_LEVEL_STRING)
-        }
-        
-        // AEC 配置（回声消除）
-        if let enableAEC = args["enableAEC"] as? Bool, enableAEC {
-            engine.setBoolParam(true, forKey: SE_PARAMS_KEY_ENABLE_AEC_BOOL)
-            if let aecModelPath = args["aecModelPath"] as? String, !aecModelPath.isEmpty {
-                engine.setStringParam(aecModelPath, forKey: SE_PARAMS_KEY_AEC_MODEL_PATH_STRING)
-            }
-        }
-        
-        // 录音机配置
-        engine.setStringParam(SE_RECORDER_TYPE_RECORDER, forKey: SE_PARAMS_KEY_RECORDER_TYPE_STRING)
-        if let recorderPath = args["recorderPath"] as? String, !recorderPath.isEmpty {
-            engine.setStringParam(recorderPath, forKey: SE_PARAMS_KEY_DIALOG_RECORDER_PATH_STRING)
-        }
-        if let enableRecorderCallback = args["enableRecorderCallback"] as? Bool {
-            engine.setBoolParam(enableRecorderCallback,
-                                forKey: SE_PARAMS_KEY_DIALOG_ENABLE_RECORDER_AUDIO_CALLBACK_BOOL)
-        }
-        
-        // 播放器配置
+        // ✅ 5. 启用播放器
         engine.setBoolParam(true, forKey: SE_PARAMS_KEY_TTS_ENABLE_PLAYER_BOOL)
-        // 在初始化引擎后设置
-        engine.setBoolParam(true, forKey: SE_PARAMS_KEY_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
-        if let enablePlayer = args["enablePlayer"] as? Bool {
-            engine.setBoolParam(enablePlayer, forKey: SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL)
-        }
-        // if let enablePlayerCallback = args["enablePlayerCallback"] as? Bool {
-        //     engine.setBoolParam(enablePlayerCallback,
-        //                         forKey: SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
-        // }
-        if let enableDecoderCallback = args["enableDecoderCallback"] as? Bool {
-            engine.setBoolParam(enableDecoderCallback,
-                                forKey: SE_PARAMS_KEY_DIALOG_ENABLE_DECODER_AUDIO_CALLBACK_BOOL)
-        }
-        if let playerPath = args["playerPath"] as? String, !playerPath.isEmpty {
-            engine.setStringParam(playerPath, forKey: SE_PARAMS_KEY_DIALOG_PLAYER_PATH_STRING)
-        }
         
-        // 工作模式配置（用于自定义 TTS）
-        if let workMode = args["workMode"] as? Int {
-            engine.setIntParam(workMode, forKey: SE_PARAMS_KEY_DIALOG_WORK_MODE_INT)
-        }
+        // ✅ 6. 启用播放器音频回调（这样才会收到 player_finish_play_audio）
+        engine.setIntParam(2, forKey: SE_PARAMS_KEY_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)  // SETtsDataCallbackModeAll = 2
         
-        // 重采样配置（自定义音频输入时使用）
-        if let enableResampler = args["enableResampler"] as? Bool {
-            engine.setBoolParam(enableResampler, forKey: SE_PARAMS_KEY_ENABLE_RESAMPLER_BOOL)
-        }
-        if let customSampleRate = args["customSampleRate"] as? Int {
-            engine.setIntParam(customSampleRate, forKey: SE_PARAMS_KEY_CUSTOM_SAMPLE_RATE_INT)
-        }
-        if let customChannel = args["customChannel"] as? Int {
-            engine.setIntParam(customChannel, forKey: SE_PARAMS_KEY_CUSTOM_CHANNEL_INT)
-        }
-        
-        
-        // 确保 AudioSession 仍然是激活状态
-            let session = AVAudioSession.sharedInstance()
-            do {
-                if !session.isOtherAudioPlaying {
-                    try session.setActive(true, options: [])
-                }
-                logAudioSessionState("before_init_engine")
-            } catch {
-                print("[DoubaoSpeech] Failed to reactivate AudioSession: \(error)")
-            }
+        // ✅ 7. StartEngine 时需要传入 payload
+        let startPayload = "{\"user\":{\"uid\":\"\(args["uid"] ?? "flutter_user")\"},\"req_params\":{\"speaker\":\"\(speaker)\"}}"
+        engine.setStringParam(startPayload, forKey: SE_PARAMS_KEY_START_ENGINE_PAYLOAD_STRING)
         
         // 初始化引擎
         let ret = engine.initEngine()
@@ -180,47 +233,69 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
             isInitialized = true
             result(true)
         } else {
-            result(FlutterError(code: "INIT_FAILED",
-                                message: "Init engine failed: \(ret)",
-                                details: nil))
+            result(FlutterError(code: "INIT_FAILED", message: "Init failed: \(ret)", details: nil))
         }
     }
     
+//    private func startEngine(result: @escaping FlutterResult) {
+//        guard let engine = engine, isInitialized else {
+//            result(FlutterError(code: "ENGINE_NOT_INIT",
+//                                message: "Engine not initialized",
+//                                details: nil))
+//            return
+//        }
+//        
+//        // 先同步停止，避免异步问题
+//        engine.send(SEDirectiveSyncStopEngine)
+//        
+//        let dict: [String: Any] = [
+//            "dialog": [
+//                "bot_name": "豆包",
+//                "extra": [
+//                    "model": "2.2.0.0",   // SC2.0版本，支持你的 S_ 音色
+//                    "input_mod": "keep_alive"
+//                ]
+//            ],
+//            "tts": [
+//                "speaker": speaker   // S_jfyjOWwY1
+//            ]
+//        ]
+//        
+//        let jsonData = try? JSONSerialization.data(withJSONObject: dict)
+//        let ttsConfig = jsonData.flatMap { String(data: $0, encoding: .utf8) } ?? "{\"dialog\":{\"bot_name\":\"豆包\"}"
+//        
+//        let ret = engine.send(SEDirectiveStartEngine, data: ttsConfig)
+//        
+//        if ret == SENoError {
+//            result(true)
+//        } else {
+//            result(FlutterError(code: "START_FAILED",
+//                                message: "Start engine failed: \(ret)",
+//                                details: nil))
+//        }
+//    }
     private func startEngine(result: @escaping FlutterResult) {
         guard let engine = engine, isInitialized else {
-            result(FlutterError(code: "ENGINE_NOT_INIT",
-                                message: "Engine not initialized",
-                                details: nil))
+            result(FlutterError(code: "ENGINE_NOT_INIT", message: "Engine not initialized", details: nil))
             return
         }
         
-        // 先同步停止，避免异步问题
+        // 1. 先同步停止
         engine.send(SEDirectiveSyncStopEngine)
         
-        let dict: [String: Any] = [
-            "dialog": [
-                "bot_name": "豆包",
-                "extra": [
-                    "model": "2.2.0.0",   // SC2.0版本，支持你的 S_ 音色
-                    "input_mod": "keep_alive"
-                ]
-            ],
-            "tts": [
-                "speaker": speaker   // S_jfyjOWwY1
-            ]
-        ]
+        // 2. 启动引擎（建连）
+        let ret1 = engine.send(SEDirectiveStartEngine, data: "")
+        if ret1 != SENoError {
+            result(FlutterError(code: "START_FAILED", message: "Start failed: \(ret1)", details: nil))
+            return
+        }
         
-        let jsonData = try? JSONSerialization.data(withJSONObject: dict)
-        let ttsConfig = jsonData.flatMap { String(data: $0, encoding: .utf8) } ?? "{\"dialog\":{\"bot_name\":\"豆包\"}"
-        
-        let ret = engine.send(SEDirectiveStartEngine, data: ttsConfig)
-        
-        if ret == SENoError {
+        // 3. 开始 Session
+        let ret2 = engine.send(SEDirectiveEventStartSession, data: "")
+        if ret2 == SENoError {
             result(true)
         } else {
-            result(FlutterError(code: "START_FAILED",
-                                message: "Start engine failed: \(ret)",
-                                details: nil))
+            result(FlutterError(code: "SESSION_FAILED", message: "Session failed: \(ret2)", details: nil))
         }
     }
     
@@ -234,25 +309,39 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         result(ret == SENoError)
     }
     
+//    private func sayHello(call: FlutterMethodCall, result: @escaping FlutterResult) {
+//        guard let engine = engine, isInitialized else {
+//            result(FlutterError(code: "ENGINE_NOT_INIT",
+//                                message: "Engine not initialized",
+//                                details: nil))
+//            return
+//        }
+//        
+//        let content = call.arguments as? String ?? "我是你的AI助手，请问有什么可以帮你。"
+//        let data = buildContentPayload(content)
+//        let ret = engine.send(SEDirectiveEventSayHello, data: data)
+//        
+//        if ret == SENoError {
+//            result(true)
+//        } else {
+//            result(FlutterError(code: "SAY_HELLO_FAILED",
+//                                message: "Say hello failed: \(ret)",
+//                                details: nil))
+//        }
+//    }
     private func sayHello(call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let engine = engine, isInitialized else {
-            result(FlutterError(code: "ENGINE_NOT_INIT",
-                                message: "Engine not initialized",
-                                details: nil))
-            return
-        }
+        guard let engine = engine else { return }
         
-        let content = call.arguments as? String ?? "我是你的AI助手，请问有什么可以帮你。"
-        let data = buildContentPayload(content)
-        let ret = engine.send(SEDirectiveEventSayHello, data: data)
+        let content = call.arguments as? String ?? "你好,我是你的Angela，请问有什么可以帮你。"
         
-        if ret == SENoError {
-            result(true)
-        } else {
-            result(FlutterError(code: "SAY_HELLO_FAILED",
-                                message: "Say hello failed: \(ret)",
-                                details: nil))
-        }
+        // 发送合成文本
+        let taskJson = "{\"req_params\":{\"text\":\"\(content)\"}}"
+        let ret1 = engine.send(SEDirectiveEventTaskRequest, data: taskJson)
+        
+        // 结束 Session，触发立即合成
+        let ret2 = engine.send(SEDirectiveEventFinishSession, data: "")
+        
+        result(ret1 == SENoError && ret2 == SENoError)
     }
     
     private func sendTextQuery(call: FlutterMethodCall, result: @escaping FlutterResult) {
