@@ -173,7 +173,9 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         engine.setOptionBoolean(
                 SpeechEngineDefines.PARAMS_KEY_TTS_ENABLE_PLAYER_BOOL,true
         )
-
+        engine.setOptionBoolean(
+                SpeechEngineDefines.PARAMS_KEY_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL,true
+        )
         args?.get("enablePlayer")?.let {
             engine.setOptionBoolean(
                 SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL,

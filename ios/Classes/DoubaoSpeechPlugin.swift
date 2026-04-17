@@ -128,7 +128,9 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         }
         
         // 播放器配置
-        engine.setBoolParam(true, forKey: SE_PARAMS_KEY_TTS_ENABLE_PLAYER_BOOL)
+        engine.setBoolParam(true, forKey: SE_PARAMS_KEY_TTS_ENABLE_PLAYER_BOOL)
+        // 在初始化引擎后设置
+        engine.setBoolParam(true, forKey: SE_PARAMS_KEY_ENABLE_PLAYER_AUDIO_CALLBACK_BOOL)
         if let enablePlayer = args["enablePlayer"] as? Bool {
             engine.setBoolParam(enablePlayer, forKey: SE_PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL)
         }
