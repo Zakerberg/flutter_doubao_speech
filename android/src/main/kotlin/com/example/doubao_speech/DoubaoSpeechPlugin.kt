@@ -428,10 +428,21 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
     }
 
     private fun sendEvent(type: String, data: String?) {
-        eventSink?.let { sink ->
-            val event = mutableMapOf<String, Any>("type" to type)
-            data?.let { event["data"] = it }
-            sink.success(event)
+//        eventSink?.let { sink ->
+//            val event = mutableMapOf<String, Any>("type" to type)
+//            data?.let { event["data"] = it }
+//            sink.success(event)
+//        }
+        // 确保在主线程发送事件
+        Handler(Looper.getMainLooper()).post {
+            try {
+                eventSink?.success(mapOf(
+                    "type" to type,
+                    "text" to text
+                ))
+            } catch (e: Exception) {
+                Log.e("DoubaoSpeech", "Failed to send event", e)
+            }
         }
     }
 
