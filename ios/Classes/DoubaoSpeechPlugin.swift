@@ -338,15 +338,15 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
 //        }
 //    }
 //    
-//    private func stopEngine(result: @escaping FlutterResult) {
-//        guard let engine = engine else {
-//            result(false)
-//            return
-//        }
-//        
-//        let ret = engine.send(SEDirectiveSyncStopEngine)
-//        result(ret == SENoError)
-//    }
+   private func stopEngine(result: @escaping FlutterResult) {
+       guard let engine = engine else {
+           result(false)
+           return
+       }
+       
+       let ret = engine.send(SEDirectiveSyncStopEngine)
+       result(ret == SENoError)
+   }
     
 //    private func sayHello(call: FlutterMethodCall, result: @escaping FlutterResult) {
 //        guard let engine = engine, isInitialized else {
