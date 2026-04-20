@@ -9,6 +9,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
     private var eventSink: FlutterEventSink?
     private var isInitialized = false
     private var speaker: String = "zh_female_vv_jupiter_bigtts" // 存储音色配置
+    private var botName: String = "Angela"
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let methodChannel = FlutterMethodChannel(
@@ -82,7 +83,12 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         if let speakerValue = args["speaker"] as? String, !speakerValue.isEmpty {
             speaker = speakerValue
         }
-        
+
+        if let botNameValue = args["botName"] as? String, !botNameValue.isEmpty {
+            // 处理 botName 配置
+             botName = botNameValue
+        }
+
         // 必需配置
         engine.setStringParam(args["engineName"] as? String ?? "dialog",
                               forKey: SE_PARAMS_KEY_ENGINE_NAME_STRING)
@@ -199,14 +205,14 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         
         let dict: [String: Any] = [
             "dialog": [
-                "bot_name": "豆包",
+                "bot_name": botName,
                 "extra": [
-                    "model": "2.2.0.0",   // SC2.0版本，支持你的 S_ 音色
+                    "model": "2.2.0.0",   // SC2.0版本，支持S_ 音色
                     "input_mod": "keep_alive"
                 ]
             ],
             "tts": [
-                "speaker": speaker   // S_jfyjOWwY1
+                "speaker": speaker
             ]
         ]
         
@@ -406,11 +412,9 @@ extension DoubaoSpeechPlugin: SpeechEngineDelegate {
                 self.sendAudioEvent(type: "recorder_audio", audioData: data)
                 
             case SEPlayerStartPlayAudio:
-                print("✅✅✅ -------------->  收到 SEPlayerStartPlayAudio")
                 self.sendEvent(type: "player_start_play_audio", data: nil)
                             
             case SEPlayerFinishPlayAudio:
-                print("✅✅✅ -------------->  收到 SEPlayerFinishPlayAudio")
                 self.sendEvent(type: "player_finish_play_audio", data: nil)
                             
             case SETtsStartPlaying:

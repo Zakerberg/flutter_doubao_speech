@@ -28,6 +28,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
     private var context: Context? = null
     private var isInitialized = false
     private var speaker: String = "zh_female_vv_jupiter_bigtts"
+    private var botName: String = "Angela"
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         context = binding.applicationContext
@@ -98,6 +99,12 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         (args?.get("speaker") as? String)?.let {
             if (it.isNotEmpty()) {
                 speaker = it
+            }
+        }
+
+        (args?.get("botName") as? String)?.let {
+            if (it.isNotEmpty()) {
+                botName = it
             }
         }
 
@@ -251,7 +258,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
 
         engine.sendDirective(SpeechEngineDefines.DIRECTIVE_SYNC_STOP_ENGINE, "")
 
-        val ttsConfig = "{\"dialog\":{\"bot_name\":\"豆包\",\"extra\":{\"model\":\"2.2.0.0\", \"input_mod\": \"keep_alive\"}},\"tts\":{\"speaker\":\"$speaker\"}}"
+        val ttsConfig = "{\"dialog\":{\"bot_name\":\"$botName\",\"extra\":{\"model\":\"2.2.0.0\", \"input_mod\": \"keep_alive\"}},\"tts\":{\"speaker\":\"$speaker\"}}"
         val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, ttsConfig)
 
         if (ret == SpeechEngineDefines.ERR_NO_ERROR) {
