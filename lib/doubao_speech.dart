@@ -135,6 +135,7 @@ class DoubaoSpeech {
     int? customSampleRate,
     int? customChannel,
     String speaker = 'zh_female_vv_jupiter_bigtts', // 新增音色参数
+    String botName = 'Angela', // 新增botName参数
   }) async {
     return await _methodChannel.invokeMethod('init', {
       'engineName': engineName,
@@ -159,6 +160,7 @@ class DoubaoSpeech {
       'customSampleRate': customSampleRate,
       'customChannel': customChannel,
       'speaker': speaker,
+      'botName': botName,
     });
   }
 

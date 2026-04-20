@@ -274,6 +274,8 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
             return
         }
 
+        // 发送取消指令，中止当前对话
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_CANCEL, "")
         val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_SYNC_STOP_ENGINE, "")
         result.success(ret == SpeechEngineDefines.ERR_NO_ERROR)
     }
