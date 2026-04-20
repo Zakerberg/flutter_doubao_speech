@@ -349,38 +349,20 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
                 }
             }
             SpeechEngineDefines.MESSAGE_TYPE_EVENT_ASR_ENDED -> sendEvent("asr_end", null)
-
-            // 流式文本内容 - 550
-            550 -> {
+            SpeechEngineDefines.MESSAGE_TYPE_DIALOG_CHAT_RESPONSE -> {
                 try {
-                    val jsonString = data?.let { String(it) }
-                    val jsonObject = JSONObject(jsonString ?: "")
-                    val content = jsonObject.optString("content")
-                    if (content.isNotEmpty()) {
-                        sendEvent("chat_result", content)
+                    val jsonString = data?.let { String(it) } ?: return@try
+                    val jsonObject = JSONObject(jsonString)
+                    val content = jsonObject.optString("content", "")
+                      if (content.isNotEmpty()) {
+                         sendEvent("chat_result", content)
+                         }
+                    // 如果 content 为空，什么都不发送（不 fallback）
+                    } catch (e: Exception) {
+                     // 解析失败，静默忽略，不发送原始 JSON
+                    Log.e("DoubaoSpeech", "Failed to parse chat response: ${e.message}")
                     }
-                } catch (e: Exception) {
-                    // 静默失败，避免频繁打印日志
                 }
-            }
-
-            // 对话结束 - 359
-            359 -> sendEvent("chat_end", null)
-            SpeechEngineDefines.MESSAGE_TYPE_EVENT_CHAT_RESPONSE -> {
-                // 提取 content 字段
-                try {
-                    val jsonString = data?.let { String(it) }
-                    val jsonObject = JSONObject(jsonString ?: "")
-                    val content = jsonObject.optString("content")
-                    if (content.isNotEmpty()) {
-                        sendEvent("chat_result", content)
-                    } else {
-                        sendEvent("chat_result", jsonString)
-                    }
-                } catch (e: Exception) {
-                    sendEvent("chat_result", data?.let { String(it) })
-                }
-            }
             SpeechEngineDefines.MESSAGE_TYPE_EVENT_CHAT_ENDED -> sendEvent("chat_end", null)
             SpeechEngineDefines.MESSAGE_TYPE_DIALOG_PLAYER_AUDIO ->
                     data?.let { sendAudioEvent("player_audio", it) }
