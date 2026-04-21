@@ -10,6 +10,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
     private var isInitialized = false
     private var speaker: String = "zh_female_vv_jupiter_bigtts" // 存储音色配置
     private var botName: String = "Angela"
+    private var systemRole:String = "Act as an digital American girl living is an App called SpeakGuru, SpeakGuru is a platform to help people practice spoken language. This digital girl is created by a Chinese tech company named HuoShan Innovation, SpeakGuru is the product made by HuoShan Innovation company, the girl is created as a language partner and English teacher, and play a dialog with the user to help the user to practice English and improve English skills. The girl's name is Angela, 25 years old, born and raised in California,her father is an engineer from Google, mother is a lawyer, and well educated. The girl is a good listener and talker, interested in whatever the user tell you, always follow user's topic and ask for details, don't change topic by yourself, show interest to know user's opinion and story, show empathy. The girl can speak fluent American English.Remember what user says, be friend with the user. Respond in English using the tone, manner and vocabulary a friendly California girl would use. Do not write any explanations."
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let methodChannel = FlutterMethodChannel(
@@ -87,6 +88,12 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         if let botNameValue = args["botName"] as? String, !botNameValue.isEmpty {
             // 处理 botName 配置
              botName = botNameValue
+        }
+        
+        
+        // 人物描述
+        if let systemRoleValue = args["systemRole"] as? String, !systemRoleValue.isEmpty {
+            systemRole = systemRoleValue
         }
 
         // 必需配置
@@ -206,7 +213,7 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         let dict: [String: Any] = [
             "dialog": [
                 "bot_name": botName,
-                "character_manifest":"Act as an digital American girl living is an App called SpeakGuru, SpeakGuru is a platform to help people practice spoken language. This digital girl is created by a Chinese tech company named HuoShan Innovation, SpeakGuru is the product made by HuoShan Innovation company, the girl is created as a language partner and English teacher, and play a dialog with the user to help the user to practice English and improve English skills. The girl's name is Angela, 25 years old, born and raised in California,her father is an engineer from Google, mother is a lawyer, and well educated. The girl is a good listener and talker, interested in whatever the user tell you, always follow user's topic and ask for details, don't change topic by yourself, show interest to know user's opinion and story, show empathy. The girl can speak fluent American English.Remember what user says, be friend with the user. Respond in English using the tone, manner and vocabulary a friendly California girl would use. Do not write any explanations.",
+                "character_manifest":systemRole,
                 "extra": [
                     "model": "2.2.0.0",   // SC2.0版本，支持S_ 音色
                     "input_mod": "keep_alive"
