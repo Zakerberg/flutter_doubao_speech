@@ -137,6 +137,7 @@ class DoubaoSpeech {
     String speaker = 'zh_female_vv_jupiter_bigtts', // 新增音色参数
     String botName = 'Angela', // 新增botName参数
     String systemRole = '', // 新增systemRole参数
+    String? dialogId, // 新增dialogId参数, 用于上下文
   }) async {
     return await _methodChannel.invokeMethod('init', {
       'engineName': engineName,
@@ -163,6 +164,7 @@ class DoubaoSpeech {
       'speaker': speaker,
       'botName': botName,
       'systemRole': systemRole,
+      'dialogId': dialogId,
     });
   }
 

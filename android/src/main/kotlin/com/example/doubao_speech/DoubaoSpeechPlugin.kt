@@ -30,6 +30,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
     private var speaker: String = "zh_female_vv_jupiter_bigtts"
     private var botName: String = "Angela"
     private var systemRole: String = "Act as an digital American girl living is an App called SpeakGuru, SpeakGuru is a platform to help people practice spoken language. This digital girl is created by a Chinese tech company named HuoShan Innovation, SpeakGuru is the product made by HuoShan Innovation company, the girl is created as a language partner and English teacher, and play a dialog with the user to help the user to practice English and improve English skills. The girl's name is Angela, 25 years old, born and raised in California,her father is an engineer from Google, mother is a lawyer, and well educated. The girl is a good listener and talker, interested in whatever the user tell you, always follow user's topic and ask for details, don't change topic by yourself, show interest to know user's opinion and story, show empathy. The girl can speak fluent American English.Remember what user says, be friend with the user. Respond in English using the tone, manner and vocabulary a friendly California girl would use. Do not write any explanations."
+    private var dialogId: String = ""
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         context = binding.applicationContext
@@ -106,6 +107,12 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         (args?.get("botName") as? String)?.let {
             if (it.isNotEmpty()) {
                 botName = it
+            }
+        }
+
+        (args?.get("dialogId") as? String)?.let {
+            if (it.isNotEmpty()) {
+                dialogId = it
             }
         }
 
@@ -265,7 +272,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
 
         engine.sendDirective(SpeechEngineDefines.DIRECTIVE_SYNC_STOP_ENGINE, "")
 
-        val ttsConfig = "{\"dialog\":{\"bot_name\":\"$botName\", \"character_manifest\":\"$systemRole\", \"extra\":{\"model\":\"2.2.0.0\", \"input_mod\": \"keep_alive\"}},\"tts\":{\"speaker\":\"$speaker\"}}"
+        val ttsConfig = "{\"dialog\":{\"bot_name\":\"$botName\",\"dialog_id\":\"$dialogId\", \"character_manifest\":\"$systemRole\", \"extra\":{\"model\":\"2.2.0.0\", \"input_mod\": \"keep_alive\"}},\"tts\":{\"speaker\":\"$speaker\"}}"
         val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, ttsConfig)
 
         if (ret == SpeechEngineDefines.ERR_NO_ERROR) {
