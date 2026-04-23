@@ -325,7 +325,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         SpeechEngineDefines.DIRECTIVE_EVENT_CHAT_TEXT_QUERY,
         json
     )
-     result.success(ret == SpeechEngineDefines.SEEngineErrorCode.SE_NO_ERROR)
+     result.success(ret == SpeechEngineDefines.ERR_NO_ERROR)
    }
 
     private fun sendTextQuery(call: MethodCall, result: Result) {
