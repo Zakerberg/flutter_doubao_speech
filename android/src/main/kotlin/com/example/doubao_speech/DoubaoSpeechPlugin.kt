@@ -64,6 +64,7 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
             "sendTextQuery" -> sendTextQuery(call, result)
             "sendCommand" -> sendCommand(call, result)
             "destroy" -> destroyEngine(result)
+            "chatTextQuery" -> chatTextQuery(call, result)
             else -> result.notImplemented()
         }
     }
@@ -308,6 +309,24 @@ class DoubaoSpeechPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
             result.error("SAY_HELLO_FAILED", "Say hello failed: $ret", null)
         }
     }
+
+    private fun chatTextQuery(call: MethodCall, result: MethodChannel.Result) {
+    if (engine == null || !isInitialized) {
+        result.error("ENGINE_NOT_INIT", "Engine not initialized", null)
+        return
+    }
+    
+    val content = call.arguments as? String ?: ""
+    val json = JSONObject().apply {
+        put("content", content)
+    }.toString()
+    
+    val ret = engine?.sendDirective(
+        SpeechEngineDefines.DIRECTIVE_EVENT_CHAT_TEXT_QUERY,
+        json
+    )
+     result.success(ret == SpeechEngineDefines.SEEngineErrorCode.SE_NO_ERROR)
+   }
 
     private fun sendTextQuery(call: MethodCall, result: Result) {
         val engine = engine ?: run {

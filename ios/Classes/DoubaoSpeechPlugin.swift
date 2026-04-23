@@ -51,6 +51,8 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
             sendCommand(call: call, result: result)
         case "destroy":
             destroyEngine(result: result)
+        case "chatTextQuery":
+                chatTextQuery(call: call, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -317,6 +319,29 @@ public class DoubaoSpeechPlugin: NSObject, FlutterPlugin {
         engine = nil
         isInitialized = false
         result(true)
+    }
+    
+    
+    // MARK: - chatTextQuery 方法
+    private func chatTextQuery(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let engine = engine, isInitialized else {
+            result(FlutterError(code: "ENGINE_NOT_INIT",
+                                message: "Engine not initialized",
+                                details: nil))
+            return
+        }
+        
+        let content = call.arguments as? String ?? ""
+        let data = buildContentPayload(content)
+        let ret = engine.send(SEDirectiveEventChatTextQuery, data: data)
+        
+        if ret == SENoError {
+            result(true)
+        } else {
+            result(FlutterError(code: "CHAT_TEXT_QUERY_FAILED",
+                                message: "Chat text query failed: \(ret)",
+                                details: nil))
+        }
     }
     
     // MARK: - Helper Methods

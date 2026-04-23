@@ -198,6 +198,11 @@ class DoubaoSpeech {
     return await _methodChannel.invokeMethod('destroy');
   }
 
+  /// Send text query to trigger AI response (without audio input)
+  static Future<bool> chatTextQuery(String content) async {
+    return await _methodChannel.invokeMethod('chatTextQuery', content);
+  }
+
   /// Check if plugin is initialized
   static bool get isInitialized => _initialized;
 
