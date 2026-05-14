@@ -1,10 +1,9 @@
 # doubao_speech
 
 #### 介绍
-Flutter doubao_speech
+这个是基于豆包实时语音大模型写的插件.
 
 #### 软件架构
-软件架构说明
 
 
 #### 安装教程
