@@ -1,50 +1,62 @@
-# doubao_speech
+# Doubao Speech Plugin
 
-#### 介绍
-这个是基于豆包实时语音大模型写的插件.
+[![pub version](https://img.shields.io/pub/v/doubao_speech.svg)](https://pub.dev/packages/doubao_speech)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-#### 软件架构
+一个基于 **豆包实时语音大模型** 开发的 Flutter 插件，提供跨平台（Android / iOS）的语音交互能力。
+
+---
+
+## 📖 简介
+
+本插件封装了豆包实时语音大模型的原生 SDK，让你可以在 Flutter 应用中快速集成：
+
+- 实时语音识别
+- 流式语音合成
+- 低延迟对话交互
+
+---
+
+## ✨ 特性
+
+- ✅ 支持 Android + iOS
+- ✅ 实时语音识别
+- ✅ 流式 TTS 返回
+- ✅ 简单易用的 Dart API
+- ✅ 基于 EventChannel 的高效通信
+
+---
+
+## 🚀 安装
+
+在 `pubspec.yaml` 中添加依赖：
+
+```yaml
+dependencies:
+  doubao_speech: ^0.0.1
+
+🎯 使用示例
 
 
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+📂 项目结构
+text
+doubao_speech/
+├── lib/                # Dart 公共接口
+├── android/            # Android 原生实现
+├── ios/                # iOS 原生实现
+├── example/            # 示例项目
+├── test/               # 单元测试
+├── pubspec.yaml
+└── README.md
 
 
-#### 特技
+📄 许可证
+本项目基于 MIT License 开源，详见 LICENSE 文件。
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+🔗 相关链接 + 🤝 参与贡献
+[端到端Android SDK 接口文档]（https://www.volcengine.com/docs/6561/1597643?lang=zh）
+[端到端iOS SDK 接口文档](https://www.volcengine.com/docs/6561/1597646?lang=zh)
 
-A new Flutter plugin project.
-
-## Getting Started
-
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+⚠️ 注意事项:
+1. 插件目前仅支持 Android 和 iOS, 需要联网使用,请遵守豆包大模型的使用条款.
+2. 豆包底层采用的是透传模式, 所以没有语音播报完成的回调,如有这方面需求,请谨慎使用.
